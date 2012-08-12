@@ -1,0 +1,300 @@
+/**********************************************************************************
+* SM-TestSuite.css                                                                *
+***********************************************************************************
+* Project Name: Test Suite                                                        *
+* Written by: Joker™                                                                                      *
+***********************************************************************************
+* This program is free software; you may redistribute it and/or modify it under   *
+* the terms of the provided license as published by Simple Machines NPO.          *
+*                                                                                 *
+* This program is distributed in the hope that it is and will be useful, but      *
+* WITHOUT ANY WARRANTIES; without even any implied warranty of MERCHANTABILITY    *
+* or FITNESS FOR A PARTICULAR PURPOSE.                                            *
+*                                                                                 *
+* See the "license.txt" file for details of the Simple Machines license.          *
+* The latest version can always be found at http://www.simplemachines.org.        *
+***********************************************************************************
+* Copyright 2011 SimpleMachines NPO - All Rights Reserved                         *
+**********************************************************************************/
+
+.rfix
+{
+	margin-top: -1px;
+}
+.hidden
+{
+	display: none;
+}
+.upper_space
+{
+	margin-top: 8px;
+}
+
+.modified
+{
+	font-size: 11px;
+	font-style: italic;
+	margin-top: 10px;
+}
+
+#ts_head
+{
+	float: right;
+	font-weight: bold;
+	padding: 0 10px 5px 0;
+}
+
+fieldset
+{
+	margin-bottom: 10px;
+	margin-top: 5px;
+}
+
+.active_run
+{
+	font-weight: bold;
+}
+
+.description_text
+{
+	float: left;
+	width: 12.5%;
+	font-weight: bold;
+	margin-top: 60px;
+}
+
+.description_box
+{
+	width: 87%;
+	float: left;
+}
+
+#post_header dt, .postbox dt
+{
+	float: left;
+	font-weight: bold;
+	margin: 0.5em 0 0;
+	padding: 0;
+	width: 12%;
+}
+
+.cat_bar, .information
+{
+	margin: 4px 10px 0 10px;
+	clear: both;
+}
+
+#ts_post.cat_bar
+{
+	margin: 0;
+}
+
+.information
+{
+	border: 0;
+	padding: 6px;
+	background: none repeat scroll 0 0 #F0F4F7;
+}
+
+.suite_frame
+{
+	background: none repeat scroll 0 0 #F0F4F7;
+	border: 1px solid #C7D2DB;
+	border-radius: 6px 6px 6px 6px;
+	margin: 0 10px 0 10px;
+	clear: both;
+	padding: 3px;
+}
+
+.suite_frame hr
+{
+	background-color: #C7D2DB;
+	padding: 0;
+	margin: 4px 0 4px 0;
+}
+
+.suite_frame a {
+	text-decoration: none;
+}
+
+.suite_frame li.suite_frame_right
+{
+    background: none repeat scroll 0 0 #FFFFFF;
+    border: 1px solid #C7D2DB;
+    margin: 0 10px 5px 10px;
+    padding: 3px;
+    width: 97%;
+	float: left;
+}
+
+.suite_frame li.details
+{
+	background: none repeat scroll 0 0 #DBE3EA;
+	border: 1px solid #C7D2DB;
+	border-radius: 6px 6px 6px 6px;
+	margin: 2px 2px 2px 10px;
+	padding: 4px;
+	min-width: 10%;
+	float: left;
+}
+
+.suite_frame li
+{
+	padding: 2px 0 0 10px;
+	margin: 0;
+}
+
+.suite_frame li.red
+{
+	color: #FF0000;
+}
+
+.suite_frame li.bottom_margin
+{
+	padding-bottom: 20px;;
+}
+
+.suite_frame ul
+{
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
+
+.suite_frame li.header
+{
+	background: none repeat scroll 0 0 #DBE3EC;
+	border: 1px solid #57788E;
+	border-radius: 5px;
+	float: left;
+	margin: 3px 10px 5px 10px;
+	width: 97%;
+	padding: 5px 5px 5px 10px;
+	font-size: 16px;
+	font-weight: bold;
+}
+
+.suite_frame li.ts_smaller
+{
+	font-size: 13px;
+}
+
+/*buttons styling */
+.buttons ul 
+{
+	margin: 0 5px 0 15px;
+	padding: 0;
+}
+
+.buttons ul li 
+{
+	list-style: none outside none;
+	margin-bottom: 10px;
+	margin-top: 5px;
+	display: inline;
+	padding: 0;
+	float: left;
+}
+
+.buttons ul li.more
+{
+	padding-left: 20px;
+}
+
+.buttons ul li a.active 
+{
+	background: none repeat scroll 0 0 #fd9604;
+	border: 1px #57788E;
+	border-radius: 5px;
+	font-weight: bold;
+	color: #FFFFFF;
+	text-decoration: none;
+	text-shadow: none;
+}
+
+.buttons ul li a.active span 
+{
+	background: none repeat scroll 0 0 #fd9604;
+	border: 1px #57788E;
+	border-radius: 5px;
+	cursor: pointer;
+	display: block;
+	margin-left: -7px;
+	padding: 0;
+	text-decoration: none;
+	padding: 0 6px;
+	left: -5px;
+	line-height: 19px;
+}
+
+.buttons ul li a.active:hover
+{
+	background: none repeat scroll 0 0 #5a6c85;
+	border: 1px #57788E;
+	border-radius: 5px;
+}
+
+.buttons ul li a.active:hover span
+{
+	background: none repeat scroll 0 0 #5a6c85;
+	border: 1px #57788E;
+	border-radius: 5px;
+}
+
+.textbox
+{
+	width: 100%;
+	padding: 0;
+	margin: 0;
+}
+
+.textbox div.text 
+{
+	float:left;
+	width: 12.3%; 
+	font-weight: bold;
+}
+
+#bbcBox_steps {
+    margin: 0.75em 0.5em;
+}
+
+#bbcBox_steps div {
+    margin: 0.2em 0;
+    vertical-align: top;
+}
+
+#bbcBox_steps div img {
+    margin: 0 1px 0 0;
+    vertical-align: top;
+}
+
+#bbcBox_steps select {
+    margin: 0 2px;
+}
+
+#smileyBox_steps {
+    margin: 0.5em;
+}
+
+#bbcBox_expected_result {
+    margin: 0.75em 0.5em;
+}
+
+#bbcBox_expected_result div {
+    margin: 0.2em 0;
+    vertical-align: top;
+}
+
+#bbcBox_expected_result div img {
+    margin: 0 1px 0 0;
+    vertical-align: top;
+}
+
+#bbcBox_expected_result select {
+    margin: 0 2px;
+}
+
+#smileyBox_expected_result {
+    margin: 0.5em;
+}

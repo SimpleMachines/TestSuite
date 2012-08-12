@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!DOCTYPE package-info SYSTEM "http://www.simplemachines.org/xml/package-info">
+
+<package-info xmlns="http://www.simplemachines.org/xml/package-info" xmlns:smf="http://www.simplemachines.org/">
+
+	<id>sid2varun:testsuite</id>
+	<name>Suite</name>
+	<version>1.0</version>
+	<type>modification</type>
+
+	<install for="2.0 - 2.0.99">
+		<readme parsebbc="true">readme.txt</readme>
+		<modification>modification.xml</modification>
+		<require-file name="Sources/SM-TestSuite.php" destination="$sourcedir" />
+		<require-file name="Sources/Subs-SM-TestSuite.php" destination="$sourcedir" />
+		<require-file name="Sources/Hooks-SM-TestSuite.php" destination="$sourcedir" />
+		<require-file name="Sources/SM-Debug-TestSuite.php" destination="$sourcedir" />
+		<require-file name="Themes/default/SM-TestSuite.template.php" destination="$themedir" />
+		<require-file name="Themes/default/css/SM-TestSuite.css" destination="$themedir/css" />
+		<require-file name="Themes/default/images/buttons/sm_edit.png" destination="$imagesdir/buttons" />
+		<require-file name="Themes/default/images/buttons/sm_delete.png" destination="$imagesdir/buttons" />
+		<require-file name="Themes/default/images/buttons/sm_copy.png" destination="$imagesdir/buttons" />
+		<require-file name="Themes/default/languages/SM-TestSuite.english.php" destination="$languagedir" />
+		<database>database.php</database>
+		<redirect url="?action=admin;area=packages" type="inline">Please stand by while you are being redirected to this modification's configuration settings.</redirect>
+	</install>
+
+	<uninstall for="2.0 - 2.0.99">
+		<modification reverse="true">modification.xml</modification>
+		<code>uninstall.php</code>
+		<remove-file name="Sources/SM-TestSuite.php" destination="$sourcedir" />
+		<remove-file name="Sources/Subs-SM-TestSuite.php" destination="$sourcedir" />
+		<remove-file name="Sources/Hooks-SM-TestSuite.php" destination="$sourcedir" />
+		<remove-file name="Sources/SM-Debug-TestSuite.php" destination="$sourcedir" />
+		<remove-file name="Themes/default/SM-TestSuite.template.php" destination="$themedir" />
+		<remove-file name="Themes/default/css/SM-TestSuite.css" destination="$themedir/css" />
+		<remove-file name="Themes/default/images/buttons/sm_edit.png" destination="$imagesdir/buttons" />
+		<remove-file name="Themes/default/images/buttons/sm_delete.png" destination="$imagesdir/buttons" />
+		<remove-file name="Themes/default/images/buttons/sm_copy.png" destination="$imagesdir/buttons" />
+		<remove-file name="Themes/default/languages/SM-TestSuite.english.php" destination="$languagedir" />
+		<redirect url="?action=admin;area=packages;sa=browse" timeout="1000" />
+	</uninstall>
+
+</package-info>

@@ -1,0 +1,9 @@
+﻿Project Name: Test Suite
+
+Developed by: Joker™ and akabugeyes
+Former Developer - Labradoodle-360 
+
+The whole project has been developed under the guidance of "Illori" and "Norv".
+
+Project is licensed under 
+http://www.simplemachines.org/about/smf/license.php
