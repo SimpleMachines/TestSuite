@@ -132,5 +132,19 @@ $txt['ts_perm_manage_all'] = 'Manage All Projects and Suites';
 $txt['ts_perm_postruns_all'] = 'Post Runs Anywhere';
 $txt['ts_perm_manage_specific'] = 'Manage Suite and Project Specific Permissions';
 
+// SM Test suite
+$txt['ts_error_no_name'] = 'Name field was left empty.';
+$txt['ts_error_no_description'] = 'Description field was left empty.';
+$txt['ts_error_no_message'] = 'Description field was left empty.';
+$txt['ts_error_no_steps'] = 'Steps field was left empty.';
+$txt['ts_error_no_expected_result'] = 'Expected Result field was left empty.';
+$txt['ts_error_no_feedback'] = 'Feedback field was left empty.';
+$txt['ts_error_no_result'] = 'Result field was left empty.';
+$txt['ts_error_long_description'] = 'The Description exceeds the maximum allowed length (65534 chracters).';
+
+$txt['ts_no_project'] = 'Sorry, the Project you are trying to edit doesn\'t exist.';
+$txt['ts_no_suite'] = 'Sorry, the Suite you are trying to edit doesn\'t exist.';
+$txt['ts_no_case'] = 'Sorry, the Case you are trying to edit doesn\'t exist.';
+$txt['ts_no_run'] = 'Sorry, the Run you are trying to edit doesn\'t exist.';
 
 ?>
