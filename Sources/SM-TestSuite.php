@@ -803,7 +803,7 @@ function TS_Cases()
 	// Now create the editor for description.
 	$editorOptions = array(
 		'id' => 'message',
-		'value' => $context['message'],
+		'value' => isset($context['message']) ? $context['message'] : '',
 		'height' => '150px',
 		'width' => '80%',
 		'disable_smiley_box' => true,
@@ -813,7 +813,7 @@ function TS_Cases()
 	// For steps.
 	$editorOptions = array(
 		'id' => 'steps',
-		'value' => $context['steps'],
+		'value' => isset($context['steps']) ? $context['steps'] : '',
 		'height' => '150px',
 		'width' => '80%',
 		'disable_smiley_box' => true,
@@ -823,7 +823,7 @@ function TS_Cases()
 	// For Expected Result.
 	$editorOptions = array(
 		'id' => 'expected_result',
-		'value' => $context['expected_result'],
+		'value' => isset($context['expected_result']) ? $context['expected_result'] : '',
 		'height' => '150px',
 		'width' => '80%',
 		'disable_smiley_box' => true,
@@ -977,10 +977,12 @@ function TS_EditCase()
 	$context['id_assigned'] = $context['test_suite']['case']['id_assigned'];
 
 	$names = array();
-	foreach ($context['test_suite']['case']['id_assigned'] as $member)
-		$names[] = $member['name'];
-	$context['id_assigned_list'] = empty($names) ? '' : '&quot;' . implode('&quot;, &quot;', $names) . '&quot;';	
-	
+	if(!empty($context['test_suite']['case']['id_assigned'])) {
+		foreach ($context['test_suite']['case']['id_assigned'] as $member)
+			$names[] = $member['name'];
+	}
+	$context['id_assigned_list'] = empty($names) ? '' : '&quot;' . implode('&quot;, &quot;', $names) . '&quot;';
+
 	if (!($context['user']['is_admin'] || TS_can_do('manage_all') || TS_can_do('manage_project', $context['test_suite']['current_project']) || 
 			TS_can_do('manage_suite', $context['test_suite']['current_suite'])))
 	{
