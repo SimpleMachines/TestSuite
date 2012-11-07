@@ -772,7 +772,6 @@ function TS_copySuite($suite_ids, $copy_level = 0)
 	}
 	$smcFunc['db_free_result']($request);
 
-	
 	foreach ($suites as $key => $suite)
 	{
 		$smcFunc['db_insert']('',
@@ -789,55 +788,22 @@ function TS_copySuite($suite_ids, $copy_level = 0)
 		);
 		$suites[$key]['id_suite_inserted'] = $smcFunc['db_insert_id']('{db_prefix}testsuite_suites', 'suite');
 	}
-	/*print_r($suites);
-	die();*/
+
 	if ($copy_level > 0)
 	{
-		/*foreach($suites as $suite) {
-			$case_ids = array();
-			$suite_loaded = TS_loadSuite($suite['id_suite']);
-	
-			if (empty($suite_loaded['cases']))
-			return false;
-			
-			else
-			{
-				foreach ($suite_loaded['cases'] as $case)
-				{
-					$case_ids[] = $case['id'];
-				}
-			}
-		}*/
 		$cases_data = array();
 		foreach($suites as $key => $suite) {
-			//print_r($suites[$key]);
-			//echo '<br />';
-
 			$suite_loaded = TS_loadSuite($suite['id_suite']);
 
-			//print_r($suite_loaded);
-			//echo '<br />';
 			if (!empty($suite_loaded['cases'])) {
-				//echo 'we got something';
-				//echo '<br />';
 				foreach ($suite_loaded['cases'] as $case)
 				{
-					//echo 'id of suite loaded'. $case['id'];
-					//echo '<br />';
 					$cases_data[$suite['id_suite_inserted']][] = $case['id'];
-					//$suites[$key]['case_id'][] = $case['id'];
 				}
 			} else {
-				//echo 'we got nothing';
-				//echo '<br />';
 				unset($suites[$key]);
 			}
-			//echo '<br />';
 		}
-		//print_r($suites);
-		//echo '<br />';
-		//print_r($case_ids);
-		//die();
 		TS_copyCase($cases_data, $copy_level - 1);
 	}
 }
@@ -952,17 +918,6 @@ function TS_removeCase($case_ids, $remove_level = false)
 }
 
 
-function search($array, $value)
-{
-
-    if (is_array($array))
-    {
-        foreach ($array as $arrkey => $subarray)
-	if (in_array($value, $subarray)) {
-		return $arrkey;
-	}
-    }
-}
 
 function TS_copyCase($casesData, $copy_level = 0)
 {
@@ -974,13 +929,9 @@ function TS_copyCase($casesData, $copy_level = 0)
 	$case_ids = array();
 	foreach($casesData as $key => $caseData) {
 		foreach($caseData as $key1 => $data){
-			//echo 'key: ' . $key1 . '<br />';
-			//echo 'value: ' . $data . '<br />';
 			$case_ids[] = $data;
 		}
 	}
-	//print_r($case_ids);
-	//die();
 
 	$request = $smcFunc['db_query']('', '
 		SELECT id_case, case_name, description, steps, expected_result, id_assigned
@@ -1005,20 +956,9 @@ function TS_copyCase($casesData, $copy_level = 0)
 	}
 	$smcFunc['db_free_result']($request);
 
-	//print_r($casesData);
-	//echo '<br />';
-	//print_r($cases);
-	//echo '<br />';
-	//die();
-	
-	foreach ($cases as $case)
+	foreach ($cases as $key => $case)
 	{
-		$id_inserted = search($casesData, $case['id_case']);
-
-		//echo $id_inserted;
-		//echo '<br />';
-		//echo $case['id_case'];
-		//die();
+		$id_inserted = searchArray($casesData, $case['id_case']);
 		$smcFunc['db_insert']('',
 			'{db_prefix}testsuite_cases',
 			array(
@@ -1033,25 +973,42 @@ function TS_copyCase($casesData, $copy_level = 0)
 			),
 			array('case')
 		);
-		$context['id_case_inserted'] = $smcFunc['db_insert_id']('{db_prefix}testsuite_cases', 'case');
+		$cases[$key]['id_case_inserted'] = $smcFunc['db_insert_id']('{db_prefix}testsuite_cases', 'case');
+		//$context['id_case_inserted'] = $smcFunc['db_insert_id']('{db_prefix}testsuite_cases', 'case');
+	}
+	/*if ($copy_level > 0)
+	{
+		$run_ids = array();
+		$case_loaded = TS_loadCase($case['id_case']);
 
-		/*if ($copy_level > 0)
+		if (empty($case_loaded['runs']))
+		return false;
+
+		else
 		{
-			$run_ids = array();
+			foreach ($case_loaded['runs'] as $run)
+			{
+				$run_ids[] = $run['id'];
+			}
+			TS_copyRun($run_ids);
+		}
+	}*/
+	if ($copy_level > 0)
+	{
+		$runs_data = array();
+		foreach($cases as $key => $case) {
 			$case_loaded = TS_loadCase($case['id_case']);
 
-			if (empty($case_loaded['runs']))
-			return false;
-
-			else
-			{
+			if (!empty($case_loaded['runs'])) {
 				foreach ($case_loaded['runs'] as $run)
 				{
-					$run_ids[] = $run['id'];
+					$runs_data[$case['id_case_inserted']][] = $run['id'];
 				}
-				TS_copyRun($run_ids);
+			} else {
+				unset($cases[$key]);
 			}
-		}*/
+		}
+		TS_copyRun($runs_data);
 	}
 }
 
@@ -1118,12 +1075,19 @@ function TS_removeRun($run_ids)
 	);
 }
 
-function TS_copyRun($run_ids)
+function TS_copyRun($runs_data)
 {
 	global $context, $smcFunc, $user_info;
 
-	if (!is_array($run_ids))
-		$run_ids = array($run_ids);
+	if (!is_array($runs_data))
+		$runs_data = array($runs_data);
+
+	$run_ids = array();
+	foreach($runs_data as $key => $run_data) {
+		foreach($run_data as $key1 => $data){
+			$run_ids[] = $data;
+		}
+	}
 
 	$request = $smcFunc['db_query']('', '
 		SELECT id_run, result_achieved, feedback, id_bug
@@ -1148,6 +1112,7 @@ function TS_copyRun($run_ids)
 
 	foreach ($runs as $run)
 	{
+		$id_inserted = searchArray($runs_data, $run['id_run']);
 		$smcFunc['db_insert']('',
 			'{db_prefix}testsuite_runs',
 			array(
@@ -1155,7 +1120,7 @@ function TS_copyRun($run_ids)
 				'poster_name' => 'string-255', 'poster_email' => 'string-255', 'id_member' => 'int', 'poster_time' => 'int',
 			),
 			array(
-				$context['id_case_inserted'], $run['result_achieved'], $run['feedback'], $run['id_bug'],
+				$id_inserted, $run['result_achieved'], $run['feedback'], $run['id_bug'],
 				$user_info['name'], $user_info['email'], $user_info['id'], time(),
 			),
 			array('run')
@@ -1898,6 +1863,18 @@ function TS_Validator($type)
 				checkSubmitOnce('free');
 			}
 		}
+}
+
+function searchArray($array, $value)
+{
+
+    if (is_array($array))
+    {
+        foreach ($array as $arrkey => $subarray)
+	if (in_array($value, $subarray)) {
+		return $arrkey;
+	}
+    }
 }
 
 ?>
