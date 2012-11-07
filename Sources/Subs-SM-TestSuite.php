@@ -1127,6 +1127,7 @@ function TS_copyRun($runs_data)
 		);
 		$context['id_run_inserted'] = $smcFunc['db_insert_id']('{db_prefix}testsuite_runs', 'run');
 	}
+	recountSuitesRuns();
 }
 
 /**
@@ -1875,6 +1876,119 @@ function searchArray($array, $value)
 		return $arrkey;
 	}
     }
+}
+
+function recountSuitesRuns() {
+	global $smcFunc, $scripturl, $context, $txt;
+	
+	$request = $smcFunc['db_query']('', '
+		SELECT id_suite
+		FROM {db_prefix}testsuite_suites
+		ORDER BY id_suite'
+	);
+
+	$idSuites = array();
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+	{
+		$idSuites[] = $row['id_suite'];
+	}
+	$smcFunc['db_free_result']($request);
+
+	foreach($idSuites as $key => $idSuite) {
+		$request = $smcFunc['db_query']('', '
+			select count(r.id_run) from smf_testsuite_runs as r
+			INNER JOIN smf_testsuite_cases AS c ON (r.id_case = c.id_case)
+			INNER JOIN smf_testsuite_suites as s ON (c.id_suite = s.id_suite)
+			where s.id_suite = {int:id_suite}',
+			array(
+				'id_suite' => $idSuite,
+			)
+		);
+		list ($total_num_runs) = $smcFunc['db_fetch_row']($request);
+		$smcFunc['db_free_result']($request);
+
+		$request1 = $smcFunc['db_query']('', '
+			select count(r.id_run) from smf_testsuite_runs as r
+			INNER JOIN smf_testsuite_cases AS c ON (r.id_case = c.id_case)
+			INNER JOIN smf_testsuite_suites as s ON (c.id_suite = s.id_suite)
+			where s.id_suite = {int:id_suite}
+			AND r.result_achieved = {string:result}',
+			array(
+				'id_suite' => $idSuite,
+				'result' => 'fail',
+			)
+		);
+		list ($num_runs_failed) = $smcFunc['db_fetch_row']($request1);
+		$smcFunc['db_free_result']($request1);
+
+		//echo $num_runs . '<br />';
+		$smcFunc['db_query']('', '
+			UPDATE {db_prefix}testsuite_suites
+			SET count = {int:total_num_runs}, fail_count = {int:num_runs_failed}
+			WHERE id_suite = {int:id_suite}',
+				array(
+					'total_num_runs' => $total_num_runs,
+					'num_runs_failed' => $num_runs_failed,
+					'id_suite' => $idSuite,
+				)
+		);
+	}
+	recountCasesRuns();
+}
+
+function recountCasesRuns() {
+	global $smcFunc, $scripturl, $context, $txt;
+	
+	$request = $smcFunc['db_query']('', '
+		SELECT id_case
+		FROM {db_prefix}testsuite_cases
+		ORDER BY id_case'
+	);
+
+	$idCases = array();
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+	{
+		$idCases[] = $row['id_case'];
+	}
+	$smcFunc['db_free_result']($request);
+
+	foreach($idCases as $key => $idCase) {
+		$request = $smcFunc['db_query']('', '
+			select count(r.id_run) from smf_testsuite_runs as r
+			INNER JOIN smf_testsuite_cases AS c ON (r.id_case = c.id_case)
+			where c.id_case = {int:id_case}',
+			array(
+				'id_case' => $idCase,
+			)
+		);
+		list ($total_num_runs) = $smcFunc['db_fetch_row']($request);
+		$smcFunc['db_free_result']($request);
+
+		$request1 = $smcFunc['db_query']('', '
+			select count(r.id_run) from smf_testsuite_runs as r
+			INNER JOIN smf_testsuite_cases AS c ON (r.id_case = c.id_case)
+			where c.id_case = {int:id_case}
+			AND r.result_achieved = {string:result}',
+			array(
+				'id_case' => $idCase,
+				'result' => 'fail',
+			)
+		);
+		list ($num_runs_failed) = $smcFunc['db_fetch_row']($request1);
+		$smcFunc['db_free_result']($request1);
+
+		//echo $num_runs . '<br />';
+		$smcFunc['db_query']('', '
+			UPDATE {db_prefix}testsuite_cases
+			SET count = {int:total_num_runs}, fail_count = {int:num_runs_failed}
+			WHERE id_case = {int:id_case}',
+				array(
+					'total_num_runs' => $total_num_runs,
+					'num_runs_failed' => $num_runs_failed,
+					'id_case' => $idCase,
+				)
+		);
+	}
 }
 
 ?>
