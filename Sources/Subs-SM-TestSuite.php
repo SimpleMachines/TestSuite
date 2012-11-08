@@ -1599,22 +1599,22 @@ function TS_updatePermissions($perms)
 		{
 			TS_clearPermissions($key, $context['test_suite']['database']['level_name'], $context['test_suite']['database']['id_level']);
 
-			//array keyword is used to make 'val' an array in some wierd cases
-			foreach ((array)$val as $group)
-			{
-				$smcFunc['db_insert']('',
+			if(is_array($val)) {
+				foreach ((array)$val as $group) {
+					$smcFunc['db_insert']('',
 					'{db_prefix}testsuite_permissions',
 					array(
-						'id_group' => 'int',
-						'permission' => 'string',
-						'id_level' => 'int',
-						'level_name' => 'string',
+					'id_group' => 'int',
+					'permission' => 'string',
+					'id_level' => 'int',
+					'level_name' => 'string',
 					),
 					array(
-						(int) $group, $key, $context['test_suite']['database']['id_level'], $context['test_suite']['database']['level_name'],
+					(int) $group, $key, $context['test_suite']['database']['id_level'], $context['test_suite']['database']['level_name'],
 					),
 					array()
-				);
+					);
+				}
 			}
 		}
 	}
