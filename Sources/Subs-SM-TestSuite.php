@@ -1566,28 +1566,29 @@ function TS_updatePermissions($perms)
 		// If there is nothing in concerned level skip the whole thing
 		if (!empty($levels))
 		{
-
 			foreach ($perms as $key => $val)
 			{
 				TS_clearPermissions($key, $context['test_suite']['database']['level_name']);
 				foreach ($levels as $level)
 				{
 					//array keyword is used to make 'val' an array in some wierd cases
-					foreach ((array)$val as $group)
-					{
-						$smcFunc['db_insert']('',
-							'{db_prefix}testsuite_permissions',
-							array(
-								'id_group' => 'int',
-								'permission' => 'string',
-								'id_level' => 'int',
-								'level_name' => 'string',
-							),
-							array(
-								(int) $group, $key, $level, $context['test_suite']['database']['level_name'],
-							),
-							array()
-						);
+					if (is_array($val)) {
+						foreach ($val as $group)
+						{
+							$smcFunc['db_insert']('',
+								'{db_prefix}testsuite_permissions',
+								array(
+									'id_group' => 'int',
+									'permission' => 'string',
+									'id_level' => 'int',
+									'level_name' => 'string',
+								),
+								array(
+									(int) $group, $key, $level, $context['test_suite']['database']['level_name'],
+								),
+								array()
+							);
+						}
 					}
 				}
 			}
@@ -1599,8 +1600,8 @@ function TS_updatePermissions($perms)
 		{
 			TS_clearPermissions($key, $context['test_suite']['database']['level_name'], $context['test_suite']['database']['id_level']);
 
-			if(is_array($val)) {
-				foreach ((array)$val as $group) {
+			if (is_array($val)) {
+				foreach ($val as $group) {
 					$smcFunc['db_insert']('',
 					'{db_prefix}testsuite_permissions',
 					array(

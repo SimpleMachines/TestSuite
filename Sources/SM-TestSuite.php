@@ -977,7 +977,7 @@ function TS_EditCase()
 	$context['id_assigned'] = $context['test_suite']['case']['id_assigned'];
 
 	$names = array();
-	if(!empty($context['test_suite']['case']['id_assigned'])) {
+	if (!empty($context['test_suite']['case']['id_assigned'])) {
 		foreach ($context['test_suite']['case']['id_assigned'] as $member)
 			$names[] = $member['name'];
 	}
