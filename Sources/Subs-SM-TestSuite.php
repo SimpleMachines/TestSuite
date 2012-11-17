@@ -1446,7 +1446,11 @@ function TS_can_do($action, $secondary = 0)
 	{
 		return true;
 	}
-	
+
+	if(empty($context['test_suite']['perms'])) {
+		$context['test_suite']['perms'] = TS_load_permissions();
+	}
+	//print_r($context['test_suite']['perms']);
 	// Grab the groups that can do...
 	if (!empty($context['test_suite']['perms']))
 	{
