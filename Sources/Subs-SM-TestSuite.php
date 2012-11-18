@@ -1450,9 +1450,12 @@ function TS_can_do($action, $secondary = 0)
 	if(empty($context['test_suite']['perms'])) {
 		$context['test_suite']['perms'] = TS_load_permissions();
 	}
-	//print_r($context['test_suite']['perms']);
+	$groups_allowed = array_keys($context['test_suite']['perms'][$action]);
+
+	//var_export($context['test_suite']['perms'][$action]);
+	//print_r(array_keys($context['test_suite']['perms'][$action]));	
 	// Grab the groups that can do...
-	if (!empty($context['test_suite']['perms']))
+	/*if (!empty($context['test_suite']['perms']))
 	{
 		// Is this a complex test?
 		if (!empty($secondary))
@@ -1475,7 +1478,22 @@ function TS_can_do($action, $secondary = 0)
 		{
 			return $context['test_suite']['perms'][$action];
 		}
+	}*/
+
+	//re-writing as per new permission system
+
+	$has_perm = false;
+	if (!empty($context['test_suite']['perms'])) {
+		foreach($groups_allowed as $key => $value) {
+			if(in_array($value, $user_info['groups'])) {
+						//echo 'in array';
+						$has_perm = true;
+						break;
+				}
+		}
 	}
+
+	return $has_perm;
 	// Something happened...no permissions found.
 	return false;
 }
@@ -1507,6 +1525,7 @@ function TS_updatePermissions($perms)
 {
 	global $context, $smcFunc;
 
+	
 	// Pick up all the ID's of selected levels
 	if (empty($context['test_suite']['database']['id_level']))
 	{
@@ -1604,6 +1623,8 @@ function TS_updatePermissions($perms)
 		{
 			TS_clearPermissions($key, $context['test_suite']['database']['level_name'], $context['test_suite']['database']['id_level']);
 
+			//echo $context['test_suite']['database']['id_level'];
+	//die();
 			if (is_array($val)) {
 				foreach ($val as $group) {
 					$smcFunc['db_insert']('',
