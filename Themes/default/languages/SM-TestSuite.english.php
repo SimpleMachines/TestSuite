@@ -21,6 +21,7 @@ $txt['ts_select_project'] = 'Select Default Project';
 
 // All strings related to Projects
 $txt['ts_project'] = 'Project';
+$txt['ts_projects'] = 'Projects';
 $txt['ts_project_action'] = 'Project Page For';
 $txt['ts_create_project'] = 'Create Project';
 $txt['ts_edit_project'] = 'Edit Project';
@@ -43,6 +44,7 @@ $txt['ts_manage_project'] = 'Manage Project';
 
 // All strings related to Suites
 $txt['ts_suite'] = 'Suite';
+$txt['ts_suites'] = 'Suites';
 $txt['ts_suite_action'] = 'Suite Page For';
 $txt['ts_create_suite'] = 'Create Suite';
 $txt['ts_edit_suite'] = 'Edit Suite';
@@ -60,6 +62,7 @@ $txt['ts_manage_suite'] = 'Manage Suite';
 
 // All strings related to Test Cases
 $txt['ts_case'] = 'Case';
+$txt['ts_cases'] = 'Cases';
 $txt['ts_case_action'] = 'Case Page For';
 $txt['ts_create_case'] = 'Create Case';
 $txt['ts_expected_result'] = 'Expected Result';
@@ -81,6 +84,7 @@ $txt['ts_manage_case'] = 'Manage Case';
 
 // All strings related to Run
 $txt['ts_run'] = 'Run';
+$txt['ts_runs'] = 'Runs';
 $txt['ts_edit_run'] = 'Edit Run';
 $txt['ts_delete_run'] = 'Delete Run';
 $txt['ts_run_list'] = 'Runs For This Suite';
@@ -127,8 +131,8 @@ $txt['ts_perm_level_projects'] = 'Manage Permission for all projects';
 $txt['ts_perm_level_suites'] = 'Manage Permission for all suites';
 $txt['ts_perm_level_cases'] = 'Manage Permission for all cases';
 $txt['ts_perm_level_runs'] = 'Manage Permission for all runs';
-$txt['ts_perm_view_all'] = 'View All Projects and Suites';
-$txt['ts_perm_manage_all'] = 'Manage All Projects and Suites';
+$txt['ts_perm_view_all'] = 'View All';
+$txt['ts_perm_manage_all'] = 'Manage All';
 $txt['ts_perm_postruns_all'] = 'Post Runs Anywhere';
 $txt['ts_perm_manage_specific'] = 'Manage Suite and Project Specific Permissions';
 

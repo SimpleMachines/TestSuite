@@ -1326,7 +1326,8 @@ function template_testsuite_admin_per_level()
 		foreach ($context['test_suite']['perms'] as $key => $perm)
 		{
 			echo ' <fieldset>';
-			echo '<legend>' . $txt['ts_perm_' . $key] . '</legend>';
+			//echo '<legend>' . $txt['ts_perm_' . $key] . '</legend>';
+			echo '<legend>' . $txt['ts_perm_' . $key] . ' ' . $txt['ts_' . $context['test_suite']['permission']['level_name']] . '</legend>';
 
 			foreach ($context['test_suite']['groups'] as $group)
 			{
@@ -1339,11 +1340,11 @@ function template_testsuite_admin_per_level()
 		}
 
 		// For the per suite/project permissions, just throw in a magic link.
-		echo '
+		/*echo '
 		<fieldset>
 			<legend>Suite and Project Specific</legend>
 			<label><a href="' . $context['test_suite']['url'] . ';admin">', $txt['ts_perm_manage_specific'], '</a></label>
-		</fieldset>';	
+		</fieldset>';*/
 
 		echo '
 		<input type="hidden" name="level_name" value="', $context['test_suite']['permission']['level_name'], '" />';
