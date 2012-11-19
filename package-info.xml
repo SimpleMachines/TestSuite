@@ -20,6 +20,7 @@
 		<require-file name="Themes/default/images/buttons/sm_edit.png" destination="$imagesdir/buttons" />
 		<require-file name="Themes/default/images/buttons/sm_delete.png" destination="$imagesdir/buttons" />
 		<require-file name="Themes/default/images/buttons/sm_copy.png" destination="$imagesdir/buttons" />
+		<require-file name="Themes/default/images/buttons/sm_manage.png" destination="$imagesdir/buttons" />
 		<require-file name="Themes/default/languages/SM-TestSuite.english.php" destination="$languagedir" />
 		<database>database.php</database>
 		<redirect url="?action=admin;area=packages" type="inline">Please stand by while you are being redirected to this modification's configuration settings.</redirect>
@@ -37,6 +38,7 @@
 		<remove-file name="Themes/default/images/buttons/sm_edit.png" destination="$imagesdir/buttons" />
 		<remove-file name="Themes/default/images/buttons/sm_delete.png" destination="$imagesdir/buttons" />
 		<remove-file name="Themes/default/images/buttons/sm_copy.png" destination="$imagesdir/buttons" />
+		<remove-file name="Themes/default/images/buttons/sm_manage.png" destination="$imagesdir/buttons" />
 		<remove-file name="Themes/default/languages/SM-TestSuite.english.php" destination="$languagedir" />
 		<redirect url="?action=admin;area=packages;sa=browse" timeout="1000" />
 	</uninstall>
