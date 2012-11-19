@@ -27,8 +27,9 @@ function TS_requestProjects()
 	global $smcFunc, $scripturl, $context, $txt, $user_info;
 	
 	$request = $smcFunc['db_query']('', '
-		SELECT p.id_project, p.project_name, p.description, p.id_member, p.poster_name, p.poster_time, p.poster_email, p.modified_time, p.modified_by
+		SELECT p.id_project, p.project_name, p.description, p.id_member, p.poster_name, p.poster_time, p.poster_email, p.modified_time, p.modified_by, p.groups_can_view, p.groups_can_manage, p.groups_can_edit, p.groups_can_delete
 		FROM {db_prefix}testsuite_projects as p
+		WHERE '. $context['TS_can_view_query'] .'
 		ORDER BY id_project'
 		);
 
@@ -1411,65 +1412,29 @@ function TS_load_permissions($level_name = false, $id_level = false)
  * @param mixed $secondary is additional info that may be needed for the permission check
  * @return bool whether the user could perform the specified action  
  */
-function TS_can_do($action, $secondary = 0)
+function TS_can_do($action, $level_name, $secondary = 0)
 {
-	global $context, $user_info;
-	/**
-	 * @todo Remove ignore permissions option
-	 */
-	if ($context['user']['is_admin'])
-	{
+	global $context, $smcFunc, $user_info;
+	if ($context['user']['is_admin']) {
 		return true;
 	}
 
-	if(empty($context['test_suite']['perms'])) {
-		$context['test_suite']['perms'] = TS_load_permissions();
-	}
-	$groups_allowed = array_keys($context['test_suite']['perms'][$action]);
+	
 
-	//var_export($context['test_suite']['perms'][$action]);
-	//print_r(array_keys($context['test_suite']['perms'][$action]));	
-	// Grab the groups that can do...
-	/*if (!empty($context['test_suite']['perms']))
-	{
-		// Is this a complex test?
-		if (!empty($secondary))
-		{
-			if ($action == 'postrun')
-			{
-				return TS_util_postrunperm($secondary);
-			}
-			elseif (isset($context['test_suite']['perms'][$action][$secondary]))
-			{
-				return $context['test_suite']['perms'][$action][$secondary];
-			}
-			// A secondary is set, but an invalid $action was given.
-			else
-			{
-				return false;
-			}
-		}
-		elseif (isset($context['test_suite']['perms'][$action]))
-		{
-			return $context['test_suite']['perms'][$action];
-		}
-	}*/
+		$request = $smcFunc['db_query']('', '
+				SELECT id_'.$level_name.'
+				FROM {db_prefix}testsuite_' . $level_name . 's
+				WHERE '. $context['TS_can_view_query'] . '',
+				array(
+						'group_ids' => $user_info['groups']
+				)
+		);
+		if ($smcFunc['db_num_rows']($request) > 0)
+				return true;
 
-	//re-writing as per new permission system
+	$smcFunc['db_free_result']($request);
+	
 
-	$has_perm = false;
-	if (!empty($context['test_suite']['perms'])) {
-		foreach($groups_allowed as $key => $value) {
-			if(in_array($value, $user_info['groups'])) {
-						//echo 'in array';
-						$has_perm = true;
-						break;
-				}
-		}
-	}
-
-	return $has_perm;
-	// Something happened...no permissions found.
 	return false;
 }
 
