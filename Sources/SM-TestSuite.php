@@ -16,7 +16,7 @@ if (!defined('SMF'))
 
 function TS_SMTestSuiteMain()
 {
-	global $context, $txt, $scripturl, $sourcedir, $settings;
+	global $context, $txt, $scripturl, $sourcedir, $settings, $user_info;
 
 	require_once($sourcedir . '/Subs-SM-TestSuite.php');
 
@@ -51,11 +51,17 @@ function TS_SMTestSuiteMain()
 	}
 
 	// You know what we like to do? View test suites. But can we here?
-	if (!TS_can_do('view_all'))
+	/*if (!TS_can_do('view_all'))
 	{
 		fatal_lang_error('ts_cannot_permission_generic');
-	}
+	}*/
 
+	$user_info['TS_projects_can_view'] = TS_level_permission('view_all', 'projects');
+	
+
+	if(!$user_info['is_admin'] && empty($user_info['TS_projects_can_view'])) {
+		fatal_lang_error('ts_cannot_permission_generic');
+	}
 	// Add a link to the Christmas tree!
 	$context['linktree'][] = array(
 		'url' => $context['test_suite']['url'] . ';main',

@@ -24,13 +24,17 @@ if (!defined('SMF'))
  */
 function TS_requestProjects()
 {
-	global $smcFunc, $scripturl, $context, $txt;
+	global $smcFunc, $scripturl, $context, $txt, $user_info;
 	
 	$request = $smcFunc['db_query']('', '
 		SELECT p.id_project, p.project_name, p.description, p.id_member, p.poster_name, p.poster_time, p.poster_email, p.modified_time, p.modified_by
-		FROM {db_prefix}testsuite_projects as p
-		ORDER BY id_project'
-	);
+		FROM {db_prefix}testsuite_projects as p ' . ($user_info['is_admin'] ? '' : '
+		WHERE p.id_project IN ({array_int:allowed})') . '
+		ORDER BY id_project',
+				array(
+				'allowed' => $user_info['TS_projects_can_view']
+				)
+		);
 
 	$projects = array();
 	while ($row = $smcFunc['db_fetch_assoc']($request))
@@ -2015,6 +2019,35 @@ function recountCasesRuns() {
 				)
 		);
 	}
+}
+
+function TS_level_permission($action = false, $level_name = false, $id_level = false) {
+		global $smcFunc, $scripturl, $context, $txt, $user_info;
+
+		//load the permission as per passed params
+		$request = $smcFunc['db_query']('', '
+		SELECT p.id_group, p.permission, p.id_level, p.level_name
+		FROM {db_prefix}testsuite_permissions as p WHERE p.permission = {string:action}
+		AND p.id_group IN ({array_int:user_groups})' . ($level_name ? '
+		AND p.level_name = {string:level_name}' : '') . ($id_level ? '
+		AND p.id_level = {int:id_level}' : '') .'
+		ORDER BY permission ASC',
+				array(
+				'level_name' => $level_name,
+				'action' => $action,
+				'id_level' => $id_level,
+				'user_groups' => $user_info['groups']
+				)
+		);
+
+		while ($row = $smcFunc['db_fetch_assoc']($request))
+		{
+			$id_level[] = $row['id_level'];
+		}
+		$smcFunc['db_free_result']($request);
+		//print_r($id_level);
+		//die();
+		return $id_level;
 }
 
 ?>
