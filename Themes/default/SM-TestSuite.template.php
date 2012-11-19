@@ -11,6 +11,7 @@
 * @version 2.0
 */
 
+
 function TS_show_header()
 {
 	global $context, $txt;
