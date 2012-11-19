@@ -28,12 +28,8 @@ function TS_requestProjects()
 	
 	$request = $smcFunc['db_query']('', '
 		SELECT p.id_project, p.project_name, p.description, p.id_member, p.poster_name, p.poster_time, p.poster_email, p.modified_time, p.modified_by
-		FROM {db_prefix}testsuite_projects as p ' . ($user_info['is_admin'] ? '' : '
-		WHERE p.id_project IN ({array_int:allowed})') . '
-		ORDER BY id_project',
-				array(
-				'allowed' => $user_info['TS_projects_can_view']
-				)
+		FROM {db_prefix}testsuite_projects as p
+		ORDER BY id_project'
 		);
 
 	$projects = array();
@@ -1365,7 +1361,10 @@ function TS_load_permissions($level_name = false, $id_level = false)
 {
 	global $context, $smcFunc, $sourcedir, $modSettings, $user_info;
 
-	$perms = array(
+	if(!$level_name)
+		return;
+
+	/*$perms = array(
 		// Guests and regular members.
 		'view_all' => false,
 		'manage_all' => false,
@@ -1376,55 +1375,27 @@ function TS_load_permissions($level_name = false, $id_level = false)
 		// Manage permission includes: run creation/modification/deletion, suite and case creating/modifying/deleting/moving
 		'manage_project' => false,
 		'manage_suite' => false,
-	);
-	// Leaving the original code intact for future reference
-	/*$request = $smcFunc['db_query']('', '
-		SELECT p.id_group, p.permission, p.id_suite, p.id_project
-		FROM {db_prefix}testsuite_permissions as p
-		WHERE p.id_group IN ({array_int:id_group})',
-		array(
-				'id_group' => $user_info['groups'],
-		)
-	);
-	
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-	{
-		if (empty($row['id_suite']) && empty($row['id_project']))
-		{
-			$perms[$row['permission']] = true;
-		}
-		elseif (!empty($row['id_suite']))
-		{
-			$perms[$row['permission']][$row['id_suite']] = true;
-		}
-		else
-		{
-			$perms[$row['permission']][$row['id_project']][] = false;
-		}
+	);*/
+
+	if($level_name == 'project') {
+		$request = $smcFunc['db_query']('', '
+				SELECT p.groups_can_view, p.groups_can_manage, p.groups_can_edit, p.groups_can_delete
+				FROM {db_prefix}testsuite_projects as p ' . ($id_level ? '
+				WHERE p.id_project = {int:id_level}' : '') .'
+				ORDER BY p.id_project ASC',
+				array(
+						'id_level' => $id_level,
+				)
+			);
 	}
-		
-	$smcFunc['db_free_result']($request);*/
-
-	//Simple load all the permissions for now
-	$request = $smcFunc['db_query']('', '
-		SELECT p.id_group, p.permission, p.id_level, p.level_name
-		FROM {db_prefix}testsuite_permissions as p ' . ($level_name ? '
-		WHERE p.level_name = {string:level_name}' : '') . ($id_level ? '
-		AND p.id_level = {int:id_level}' : '') .'
-		ORDER BY permission ASC',
-		array(
-				'level_name' => $level_name,
-				'id_level' => $id_level,
-		)
-	);
 
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
-		$perms[$row['permission']][$row['id_group']] = array(
-			'id_group' => $row['id_group'],
-			'permission' => $row['permission'],
-			'id_level' => $row['id_level'],
-			'level_name' => $row['level_name'],
+		$perms = array(
+			'groups_can_view' => $row['groups_can_view'],
+			'groups_can_manage' => $row['groups_can_manage'],
+			'groups_can_edit' => $row['groups_can_edit'],
+			'groups_can_delete' => $row['groups_can_delete'],
 		);
 	}
 	$smcFunc['db_free_result']($request);
@@ -1529,142 +1500,36 @@ function TS_updatePermissions($perms)
 {
 	global $context, $smcFunc;
 
-	
-	// Pick up all the ID's of selected levels
-	if (empty($context['test_suite']['database']['id_level']))
-	{
-		if ($context['test_suite']['database']['level_name'] == 'projects')
-		{
-			$request = $smcFunc['db_query']('', '
-				SELECT id_project
-				FROM {db_prefix}testsuite_projects'
+	//Jokerzz on fire :D
+		TS_clearPermissions($context['test_suite']['database']['level_name'], $context['test_suite']['database']['id_level']);
+
+		$smcFunc['db_query']('', '
+				UPDATE {db_prefix}testsuite_' . $context['test_suite']['database']['level_name'] . 's
+				SET groups_can_view = {string:can_view_list}, groups_can_manage = {string:can_manage_list}, groups_can_edit = {string:can_edit_list}, groups_can_delete = {string:can_delete_list}
+				WHERE id_'.$context['test_suite']['database']['level_name'].' = {int:id_map}',
+				array(
+						'id_map' => $context['test_suite']['database']['id_level'],
+					'can_view_list' => $context['test_suite']['database']['groups_can_view'],
+					'can_manage_list' => $context['test_suite']['database']['groups_can_manage'],
+					'can_edit_list' => $context['test_suite']['database']['groups_can_edit'],
+					'can_delete_list' => $context['test_suite']['database']['groups_can_delete'],
+				)
 			);
-
-			$levels = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
-			{
-				$levels[] = $row['id_project'];
-			}
-			$smcFunc['db_free_result']($request);
-		}
-		elseif ($context['test_suite']['database']['level_name'] == 'suites')
-		{
-			$request = $smcFunc['db_query']('', '
-				SELECT id_suite
-				FROM {db_prefix}testsuite_suites'
-			);
-
-			$levels = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
-			{
-				$levels[] = $row['id_suite'];
-			}
-			$smcFunc['db_free_result']($request);
-		}
-		elseif ($context['test_suite']['database']['level_name'] == 'cases')
-		{
-			$request = $smcFunc['db_query']('', '
-				SELECT id_case
-				FROM {db_prefix}testsuite_cases'
-			);
-
-			$levels = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
-			{
-				$levels[] = $row['id_case'];
-			}
-			$smcFunc['db_free_result']($request);
-		}
-		elseif ($context['test_suite']['database']['level_name'] == 'runs')
-		{
-			$request = $smcFunc['db_query']('', '
-				SELECT id_run
-				FROM {db_prefix}testsuite_runs'
-			);
-
-			$levels = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
-			{
-				$levels[] = $row['id_run'];
-			}
-			$smcFunc['db_free_result']($request);
-		}
-
-		// If there is nothing in concerned level skip the whole thing
-		if (!empty($levels))
-		{
-			foreach ($perms as $key => $val)
-			{
-				TS_clearPermissions($key, $context['test_suite']['database']['level_name']);
-				foreach ($levels as $level)
-				{
-					//array keyword is used to make 'val' an array in some wierd cases
-					if (is_array($val)) {
-						foreach ($val as $group)
-						{
-							$smcFunc['db_insert']('',
-								'{db_prefix}testsuite_permissions',
-								array(
-									'id_group' => 'int',
-									'permission' => 'string',
-									'id_level' => 'int',
-									'level_name' => 'string',
-								),
-								array(
-									(int) $group, $key, $level, $context['test_suite']['database']['level_name'],
-								),
-								array()
-							);
-						}
-					}
-				}
-			}
-		}
-	}
-	else
-	{
-		foreach ($perms as $key => $val)
-		{
-			TS_clearPermissions($key, $context['test_suite']['database']['level_name'], $context['test_suite']['database']['id_level']);
-
-			//echo $context['test_suite']['database']['id_level'];
-	//die();
-			if (is_array($val)) {
-				foreach ($val as $group) {
-					$smcFunc['db_insert']('',
-					'{db_prefix}testsuite_permissions',
-					array(
-					'id_group' => 'int',
-					'permission' => 'string',
-					'id_level' => 'int',
-					'level_name' => 'string',
-					),
-					array(
-					(int) $group, $key, $context['test_suite']['database']['id_level'], $context['test_suite']['database']['level_name'],
-					),
-					array()
-					);
-				}
-			}
-		}
-	}
 }
 
-function TS_clearPermissions($perm, $level_name, $id_level = false)
+function TS_clearPermissions($level_name, $id_level = false)
 {
 	global $smcFunc;
 
-	$smcFunc['db_query']('', '
-		DELETE FROM {db_prefix}testsuite_permissions
-		WHERE permission = {string:permission}
-		AND level_name = {string:level_name}' . ($id_level ? '
-		AND id_level = {int:id_level}' : '') .'',
-		array(
-			'permission' => $perm,
-			'level_name' => $level_name,
-			'id_level' => $id_level,
-		)
-	);
+		$smcFunc['db_query']('', '
+				UPDATE {db_prefix}testsuite_'. $level_name .'s
+				SET groups_can_view = {string:blank_string}, groups_can_manage = {string:blank_string}, groups_can_edit = {string:blank_string}, groups_can_delete = {string:blank_string}
+				WHERE id_'. $level_name .' = {int:id_level}',
+				array(
+						'id_level' => $id_level,
+						'blank_string' => ''
+				)
+		);
 }
 
 function TS_simple_GetProjects()

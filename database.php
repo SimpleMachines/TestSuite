@@ -75,6 +75,34 @@ $tables = array(
 				'null' => false,
 				'default' => '',
 			),
+            array(
+                'name' => 'groups_can_view',
+                'type' => 'varchar',
+                'size' => 255,
+                'null' => false,
+                'default' => '',
+            ),
+            array(
+                'name' => 'groups_can_manage',
+                'type' => 'varchar',
+                'size' => 255,
+                'null' => false,
+                'default' => '',
+            ),
+            array(
+                'name' => 'groups_can_edit',
+                'type' => 'varchar',
+                'size' => 255,
+                'null' => false,
+                'default' => '',
+            ),
+            array(
+                'name' => 'groups_can_delete',
+                'type' => 'varchar',
+                'size' => 255,
+                'null' => false,
+                'default' => '',
+            ),
 		),
 		'indexes' => array(
 			array(
@@ -172,6 +200,34 @@ $tables = array(
 				'null' => false,
 				'default' => '0',
 			),
+            array(
+                'name' => 'groups_can_view',
+                'type' => 'varchar',
+                'size' => 255,
+                'null' => false,
+                'default' => '',
+            ),
+            array(
+                'name' => 'groups_can_manage',
+                'type' => 'varchar',
+                'size' => 255,
+                'null' => false,
+                'default' => '',
+            ),
+            array(
+                'name' => 'groups_can_edit',
+                'type' => 'varchar',
+                'size' => 255,
+                'null' => false,
+                'default' => '',
+            ),
+            array(
+                'name' => 'groups_can_delete',
+                'type' => 'varchar',
+                'size' => 255,
+                'null' => false,
+                'default' => '',
+            ),
 		),
 		'indexes' => array(
 			array(
@@ -287,6 +343,34 @@ $tables = array(
 				'null' => false,
 				'default' => '0',
 			),
+            array(
+                'name' => 'groups_can_view',
+                'type' => 'varchar',
+                'size' => 255,
+                'null' => false,
+                'default' => '',
+            ),
+            array(
+                'name' => 'groups_can_manage',
+                'type' => 'varchar',
+                'size' => 255,
+                'null' => false,
+                'default' => '',
+            ),
+            array(
+                'name' => 'groups_can_edit',
+                'type' => 'varchar',
+                'size' => 255,
+                'null' => false,
+                'default' => '',
+            ),
+            array(
+                'name' => 'groups_can_delete',
+                'type' => 'varchar',
+                'size' => 255,
+                'null' => false,
+                'default' => '',
+            ),
 		),
 		'indexes' => array(
 			array(
@@ -376,54 +460,40 @@ $tables = array(
 				'null' => false,
 				'default' => '',
 			),
+            array(
+                'name' => 'groups_can_view',
+                'type' => 'varchar',
+                'size' => 255,
+                'null' => false,
+                'default' => '',
+            ),
+            array(
+                'name' => 'groups_can_manage',
+                'type' => 'varchar',
+                'size' => 255,
+                'null' => false,
+                'default' => '',
+            ),
+            array(
+                'name' => 'groups_can_edit',
+                'type' => 'varchar',
+                'size' => 255,
+                'null' => false,
+                'default' => '',
+            ),
+            array(
+                'name' => 'groups_can_delete',
+                'type' => 'varchar',
+                'size' => 255,
+                'null' => false,
+                'default' => '',
+            ),
 		),
 		'indexes' => array(
 			array(
 				'type' => 'primary',
 				'columns' => array('id_run'),
 			),
-		),
-	),
-	'testsuite_permissions' => array(
-		'columns' => array(
-			array(
-				'name' => 'id_group',
-				'type' => 'smallint',
-				'size' => 5,
-				'default' => 0,
-			),
-			array(
-				'name' => 'permission',
-				'type' => 'varchar',
-				'size' => 30,
-				'default' => '',
-			),
-			/*array(
-				'name' => 'id_suite',
-				'type' => 'smallint',
-				'size' => 5,
-				'default' => 0,
-			),
-			array(
-				'name' => 'id_project',
-				'type' => 'smallint',
-				'size' => 5,
-				'default' => 0,
-			),*/
-			array(
-				'name' => 'id_level',
-				'type' => 'int',
-				'size' => 10,
-				'default' => 0,
-			),
-			array(
-				'name' => 'level_name',
-				'type' => 'varchar',
-				'size' => 30,
-				'default' => '',
-			),
-		),
-		'indexes' => array(
 		),
 	),
 );
@@ -444,26 +514,6 @@ $column = array(
 
 $smcFunc['db_add_column']('{db_prefix}members', $column);
 
-/*
-$perm_default_perms = array(
-	array('id_group' => 2, 'permission' => 'view_all', 'id_suite' => 0, 'id_project' => 0),
-);
-
-foreach ($perm_default_perms as $perm)
-{
-	// Insert the Project.
-	$smcFunc['db_insert']('',
-		'{db_prefix}testsuite_permissions',
-		array(
-			'id_group' => 'int', 'permission' => 'string-30', 'id_suite' => 'int', 'id_project' => 'int',
-		),
-		array(
-			$perm['id_group'], $perm['permission'], $perm['id_suite'], $perm['id_project'],
-		),
-		array('')
-	);
-}
-*/
 add_integration_function('integrate_pre_include', $sourcedir . '/Hooks-SM-TestSuite.php', true);
 add_integration_function('integrate_actions', 'TS_AddAction', true);
 add_integration_function('integrate_menu_buttons', 'TS_AddToMenu', true);

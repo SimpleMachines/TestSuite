@@ -49,19 +49,11 @@ function TS_SMTestSuiteMain()
 		include_once($sourcedir . '/SM-Debug-TestSuite.php');
 		debug_code();
 	}
-
-	// You know what we like to do? View test suites. But can we here?
-	/*if (!TS_can_do('view_all'))
-	{
+	
+	/*if(!$user_info['is_admin'] && empty($user_info['TS_projects_can_view'])) {
 		fatal_lang_error('ts_cannot_permission_generic');
 	}*/
 
-	$user_info['TS_projects_can_view'] = TS_level_permission('view_all', 'projects');
-	
-
-	if(!$user_info['is_admin'] && empty($user_info['TS_projects_can_view'])) {
-		fatal_lang_error('ts_cannot_permission_generic');
-	}
 	// Add a link to the Christmas tree!
 	$context['linktree'][] = array(
 		'url' => $context['test_suite']['url'] . ';main',
@@ -1834,16 +1826,17 @@ function TS_Admin_Main()
 	);
 
 	// Apologies, for now this is hardcoded
-	$context['test_suite']['levels'] = array(
+	/*$context['test_suite']['levels'] = array(
 		'1' => 'projects',
 		'2' => 'suites',
 		'3' => 'cases',
 		'4' => 'runs',
-	);
+	);*/
 }
 
 function TS_Admin_PerLevel()
 {
+		//echo 'admin';
 	global $context, $txt, $sourcedir, $smcFunc;
 
 	$context['test_suite']['permission']['level_name'] = isset($_REQUEST['level_name']) ? strtolower($_REQUEST['level_name']) : '';
@@ -1879,47 +1872,17 @@ function TS_Admin_PerLevel()
 	$context['test_suite']['permissions'] = array();
 	$context['test_suite']['perms'] = TS_load_permissions($context['test_suite']['permission']['level_name'], $context['test_suite']['permission']['id_level']);
 
-	foreach ($context['test_suite']['perms'] as $key => $perm)
-	{
-		// @todo significantly clean and refactor this.
-		if ($key == 'postruns_proj' || $key == 'postruns_suite' || $key == 'manage_project' || $key == 'manage_suite')
-		{
-			unset($context['test_suite']['perms'][$key]);
-		}
-		// take care of empty floating around values for now
-		if (is_array($perm))
-		{
-			foreach ($perm as $perm_key => $perm_value)
-			{
-				$context['test_suite']['permissions'][$perm_value['permission']][$perm_value['id_group']] = $perm_value['id_group'];
-			}
-		}
-	}
-
-	/*$request = $smcFunc['db_query']('', 
-		'SELECT p.permission, p.id_group FROM {db_prefix}testsuite_permissions AS p');
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-	{
-		$context['test_suite']['permissions'][$row['permission']][$row['id_group']] = true;
-	}
-	$smcFunc['db_free_result']($request);*/
-
 	if (isset($_POST['submit']))
-	{	
-		$permissions = array(
-			'view_all' => isset($_POST['view_all']) ? $_POST['view_all'] : '',
-			'manage_all' => isset($_POST['manage_all']) ? $_POST['manage_all'] : '',
-			'postruns_all' => isset($_POST['postruns_all']) ? $_POST['postruns_all'] : '',
-		);
-		$context['test_suite']['levels'] = array(
-			'1' => 'projects',
-			'2' => 'suites',
-			'3' => 'cases',
-			'4' => 'runs',
-		);
-		$context['test_suite']['database']['level_name'] = in_array($_POST['level_name'], $context['test_suite']['levels']) ? $context['test_suite']['permission']['level_name'] : '';
-		$context['test_suite']['database']['id_level'] = !empty($_POST['id_level']) ? (int) $_POST['id_level'] : '';
-		TS_updatePermissions($permissions);
+	{
+		$context['test_suite']['database'] = array();
+		$context['test_suite']['database']['level_name'] = $_POST['level_name'];
+		$context['test_suite']['database']['id_level'] = $_POST['id_level'];
+		$context['test_suite']['database']['groups_can_view'] = isset($_POST['groups_can_view']) && !empty($_POST['groups_can_view']) ? implode(",", $_POST['groups_can_view']) : '';
+		$context['test_suite']['database']['groups_can_manage'] = isset($_POST['groups_can_manage']) && !empty($_POST['groups_can_manage']) ? implode(",", $_POST['groups_can_manage']) : '';
+		$context['test_suite']['database']['groups_can_edit'] = isset($_POST['groups_can_edit']) && !empty($_POST['groups_can_edit']) ? implode(",", $_POST['groups_can_edit']) : '';
+		$context['test_suite']['database']['groups_can_delete'] = isset($_POST['groups_can_delete']) && !empty($_POST['groups_can_delete']) ? implode(",", $_POST['groups_can_delete']) : '';
+
+		TS_updatePermissions($context['test_suite']['database']);
 		redirectexit('action=testsuite;admin=per_level;level_name='. $context['test_suite']['permission']['level_name']);
 	}
 }

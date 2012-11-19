@@ -11,7 +11,6 @@
 * @version 2.0
 */
 
-
 function TS_show_header()
 {
 	global $context, $txt;
@@ -88,7 +87,7 @@ function template_main()
 					<a class="active" href="', $context['test_suite']['url'], ';copyproject=', $value['id'], '">
 						<img src="' . $settings['images_url'] . '/buttons/sm_copy.png" alt="', $txt['ts_copy_project'], '" title="', $txt['ts_copy_project'], '" />
 					</a>
-					<a class="active" href="', $context['test_suite']['url'], ';admin=per_level;level_name=projects;id_level='. $value['id'] . '">
+					<a class="active" href="', $context['test_suite']['url'], ';admin=per_level;level_name=project;id_level='. $value['id'] . '">
 						<img src="' . $settings['images_url'] . '/buttons/sm_manage.png" alt="', $txt['ts_manage_project'], '" title="', $txt['ts_manage_project'], '" />
 					</a>
 					<a class="active" href="', $context['test_suite']['url'], ';removeproject='. $value['id'] . '" onclick="return confirm(\'', $txt['ts_remove_project'], '?\');">
@@ -155,7 +154,7 @@ function template_sm_testsuite_project_view()
 						<a class="active" href="', $context['test_suite']['url'], ';copysuite=', $value['id'], '">
 							<img src="' . $settings['images_url'] . '/buttons/sm_copy.png" alt="', $txt['ts_copy_suite'], '" title="', $txt['ts_copy_suite'], '" />
 						</a>
-						<a class="active" href="', $context['test_suite']['url'], ';admin=per_level;level_name=suites;id_level='. $value['id'] . '">
+						<a class="active" href="', $context['test_suite']['url'], ';admin=per_level;level_name=suite;id_level='. $value['id'] . '">
 							<img src="' . $settings['images_url'] . '/buttons/sm_manage.png" alt="', $txt['ts_manage_suite'], '" title="', $txt['ts_manage_suite'], '" />
 						</a>
 						<a class ="active" href="', $context['test_suite']['url'], ';removesuite='. $value['id'] . '" onclick="return confirm(\'', $txt['ts_remove_suite'], '?\');">
@@ -261,7 +260,7 @@ function template_sm_testsuite_case_view()
 							<a class="active" href="', $context['test_suite']['url'], ';copycase=', $value['id'], '">
 								<img src="' . $settings['images_url'] . '/buttons/sm_copy.png" alt="', $txt['ts_copy_case'], '" title="', $txt['ts_copy_case'], '" />
 							</a>
-							<a class="active" href="', $context['test_suite']['url'], ';admin=per_level;level_name=cases;id_level='. $value['id'] . '">
+							<a class="active" href="', $context['test_suite']['url'], ';admin=per_level;level_name=case;id_level='. $value['id'] . '">
 								<img src="' . $settings['images_url'] . '/buttons/sm_manage.png" alt="', $txt['ts_manage_case'], '" title="', $txt['ts_manage_case'], '" />
 							</a>
 							<a class="active" href="', $context['test_suite']['url'], ';removecase='. $value['id'] . '" onclick="return confirm(\'', $txt['ts_remove_case'], '?\');">
@@ -1294,58 +1293,22 @@ function template_testsuite_admin_per_level()
 	</div>
 	<div class="suite_frame">';
 
-	/*echo '
-	<form action="', $context['test_suite']['url'], ';admin" method="post">';
+	echo '
+	<form action="', $context['test_suite']['url'], ';admin=per_level;level_name='. $context['test_suite']['permission']['level_name'] . '" method="post">';
+	
 		foreach ($context['test_suite']['perms'] as $key => $perm)
 		{
+				$perm = $perm == '' ? '' : explode(',', $perm);
 			echo ' <fieldset>';
 			echo '<legend>' . $txt['ts_perm_' . $key] . '</legend>';
 
 			foreach ($context['test_suite']['groups'] as $group)
 			{
 				echo '
-					<input' . (!empty($context['test_suite']['permissions'][$key][$group['id_group']]) ? ' checked="checked"' : '') . ' id="' . $group['id_group'] . '" type="checkbox" name="' . $key . '[]" value="' . $group['id_group'] . '" /> <label for="' . $group['id_group'] . '">' . $group['group_name'] . '</label><br />';
+					<input' . (is_array($perm) && in_array($group['id_group'], $perm) ? ' checked="checked"' : '') . ' id="' . $group['id_group'] . '" type="checkbox" name="' . $key . '[]" value="' . $group['id_group'] . '" /> <label for="' . $group['id_group'] . '">' . $group['group_name'] . '</label><br />';
 			}
 			echo ' </fieldset>';
 		}
-
-		// For the per suite/project permissions, just throw in a magic link.
-		echo '
-		<fieldset>
-			<legend>Suite and Project Specific</legend>
-			<label><a href="' . $context['test_suite']['url'] . ';admin">', $txt['ts_perm_manage_specific'], '</a></label>
-		</fieldset>';	
-
-		echo '
-		<input type="submit" name="submit" value="', $txt['ts_submit'], '" tabindex="', $context['tabindex']++, '" class="button_submit" />';
-
-	echo '
-	</form>';*/
-
-	echo '
-	<form action="', $context['test_suite']['url'], ';admin=per_level;level_name='. $context['test_suite']['permission']['level_name'] . '" method="post">';
-		foreach ($context['test_suite']['perms'] as $key => $perm)
-		{
-			echo ' <fieldset>';
-			//echo '<legend>' . $txt['ts_perm_' . $key] . '</legend>';
-			echo '<legend>' . $txt['ts_perm_' . $key] . ' ' . $txt['ts_' . $context['test_suite']['permission']['level_name']] . '</legend>';
-
-			foreach ($context['test_suite']['groups'] as $group)
-			{
-				//Wow took 30 mins to catch this minute issue
-				//placed isset in place of empty as its not picking up regular member id, i.e '0'
-				echo '
-					<input' . (isset($context['test_suite']['permissions'][$key][$group['id_group']]) ? ' checked="checked"' : '') . ' id="' . $group['id_group'] . '" type="checkbox" name="' . $key . '[]" value="' . $group['id_group'] . '" /> <label for="' . $group['id_group'] . '">' . $group['group_name'] . '</label><br />';
-			}
-			echo ' </fieldset>';
-		}
-
-		// For the per suite/project permissions, just throw in a magic link.
-		/*echo '
-		<fieldset>
-			<legend>Suite and Project Specific</legend>
-			<label><a href="' . $context['test_suite']['url'] . ';admin">', $txt['ts_perm_manage_specific'], '</a></label>
-		</fieldset>';*/
 
 		echo '
 		<input type="hidden" name="level_name" value="', $context['test_suite']['permission']['level_name'], '" />';
