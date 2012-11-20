@@ -1830,25 +1830,16 @@ function TS_Admin_Main()
 		'url' => $context['test_suite']['url'] . ';admin',
 		'name' => $txt['ts_admin'],
 	);
-
-	// Apologies, for now this is hardcoded
-	/*$context['test_suite']['levels'] = array(
-		'1' => 'projects',
-		'2' => 'suites',
-		'3' => 'cases',
-		'4' => 'runs',
-	);*/
 }
 
 function TS_Admin_PerLevel()
 {
-		//echo 'admin';
 	global $context, $txt, $sourcedir, $smcFunc;
 
 	$context['test_suite']['permission']['level_name'] = isset($_REQUEST['level_name']) ? strtolower($_REQUEST['level_name']) : '';
 	$context['test_suite']['permission']['id_level'] = isset($_REQUEST['id_level']) && !empty($_REQUEST['id_level']) ? (int) $_REQUEST['id_level'] : '';
 
-	if (empty($context['test_suite']['permission']['level_name']))
+	if (empty($context['test_suite']['permission']['level_name']) || empty($context['test_suite']['permission']['id_level']))
 		redirectexit('action=testsuite;admin');
 
 	else
@@ -1889,7 +1880,7 @@ function TS_Admin_PerLevel()
 		$context['test_suite']['database']['groups_can_delete'] = isset($_POST['groups_can_delete']) && !empty($_POST['groups_can_delete']) ? implode(",", $_POST['groups_can_delete']) : '';
 
 		TS_updatePermissions($context['test_suite']['database']);
-		redirectexit('action=testsuite;admin=per_level;level_name='. $context['test_suite']['permission']['level_name']);
+		redirectexit('action=testsuite;admin=per_level;level_name='. $context['test_suite']['permission']['level_name'] .';id_level='.$context['test_suite']['permission']['id_level']);
 	}
 }
 

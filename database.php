@@ -103,6 +103,13 @@ $tables = array(
                 'null' => false,
                 'default' => '',
             ),
+            array(
+                'name' => 'groups_can_create',
+                'type' => 'varchar',
+                'size' => 255,
+                'null' => false,
+                'default' => '',
+            ),
 		),
 		'indexes' => array(
 			array(
@@ -223,6 +230,13 @@ $tables = array(
             ),
             array(
                 'name' => 'groups_can_delete',
+                'type' => 'varchar',
+                'size' => 255,
+                'null' => false,
+                'default' => '',
+            ),
+            array(
+                'name' => 'groups_can_create',
                 'type' => 'varchar',
                 'size' => 255,
                 'null' => false,
@@ -366,6 +380,13 @@ $tables = array(
             ),
             array(
                 'name' => 'groups_can_delete',
+                'type' => 'varchar',
+                'size' => 255,
+                'null' => false,
+                'default' => '',
+            ),
+            array(
+                'name' => 'groups_can_create',
                 'type' => 'varchar',
                 'size' => 255,
                 'null' => false,

@@ -126,15 +126,16 @@ $txt['ts_members'] = 'Regular Members';
 
 // TS Permissions...
 $txt['ts_perm'] = 'Test Suite Permissions';
-$txt['ts_perm_level'] = 'Adjust permission per level';
-/*$txt['ts_perm_level_projects'] = 'Manage Permission for all projects';
+$txt['ts_global_perm'] = 'Adjust global permissions';
+/*$txt['ts_perm_level'] = 'Adjust permission per level';
+$txt['ts_perm_level_projects'] = 'Manage Permission for all projects';
 $txt['ts_perm_level_suites'] = 'Manage Permission for all suites';
 $txt['ts_perm_level_cases'] = 'Manage Permission for all cases';
 $txt['ts_perm_level_runs'] = 'Manage Permission for all runs';
 $txt['ts_perm_view_all'] = 'View All';
-$txt['ts_perm_manage_all'] = 'Manage All';*/
+$txt['ts_perm_manage_all'] = 'Manage All';
 $txt['ts_perm_postruns_all'] = 'Post Runs Anywhere';
-$txt['ts_perm_manage_specific'] = 'Manage Suite and Project Specific Permissions';
+$txt['ts_perm_manage_specific'] = 'Manage Suite and Project Specific Permissions';*/
 
 $txt['ts_perm_groups_can_view'] = 'Groups can View';
 $txt['ts_perm_groups_can_manage'] = 'Groups can Manage';
