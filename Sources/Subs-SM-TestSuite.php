@@ -1413,29 +1413,27 @@ function TS_load_permissions($level_name = false, $id_level = false)
  * @param mixed $secondary is additional info that may be needed for the permission check
  * @return bool whether the user could perform the specified action  
  */
-function TS_can_do($action, $level_name, $secondary = 0)
-{
+function TS_can_do($action, $level_name, $secondary = 0) {
 	global $context, $smcFunc, $user_info;
+
 	if ($context['user']['is_admin']) {
 		return true;
 	}
 
-	
-
-		$request = $smcFunc['db_query']('', '
-				SELECT id_'.$level_name.'
-				FROM {db_prefix}testsuite_' . $level_name . 's
-				WHERE '. $context['TS_can_view_query'] . '',
-				array(
-						'group_ids' => $user_info['groups']
-				)
-		);
-		if ($smcFunc['db_num_rows']($request) > 0)
-				return true;
+	$request = $smcFunc['db_query']('', '
+		SELECT id_' . $level_name . '
+		FROM {db_prefix}testsuite_' . $level_name . 's
+		WHERE ' . $context['TS_can_'. $action .'_query'] . '',
+		array(
+			'group_ids' => $user_info['groups']
+		)
+	);
+	if ($smcFunc['db_num_rows']($request) > 0) {
+		$smcFunc['db_free_result']($request);
+		return true;
+	}
 
 	$smcFunc['db_free_result']($request);
-	
-
 	return false;
 }
 
@@ -1882,6 +1880,28 @@ function TS_level_permission($action = false, $level_name = false, $id_level = f
 		return $id_level;
 }
 
+
+function TS_load_global_permissions()
+{
+	global $context, $smcFunc, $sourcedir, $modSettings, $user_info;
+
+		$request = $smcFunc['db_query']('', '
+			SELECT permission, member_groups
+			FROM {db_prefix}testsuite_permission'
+		);
+
+
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+	{
+		$perms[] = array(
+			'permission' => $row['permission'],
+			'member_groups' => $row['member_groups'],
+		);
+	}
+	$smcFunc['db_free_result']($request);
+
+	return $perms;
+}
 
 /**
  * Used to checks whether string value exist in array or not.

@@ -55,8 +55,11 @@ function TS_SMTestSuiteMain()
 		include_once($sourcedir . '/SM-Debug-TestSuite.php');
 		debug_code();
 	}
-	
-	if(!TS_can_do('view_all', 'project')) {
+
+	//Load all global permissions for TS
+	$context['test_suite']['global_perms'] = TS_load_global_permissions();
+
+	if(!TS_can_do('view', 'project')) {
 		fatal_lang_error('ts_cannot_permission_generic');
 	}
 
@@ -271,6 +274,7 @@ function TS_ShowCurrentCase()
 			' class="smalltext"' : '') . '><strong class="nav"> )</strong></span>'
 	);
 
+	$context['test_suite']['buttons'] = array();
 	if($context['test_suite']['case']['groups_can_create']) {
 		$context['test_suite']['buttons'] = array(
 			array(
@@ -336,19 +340,19 @@ function TS_Project()
 	if (empty($context['test_suite']['current_project']))
 	{
 		$context['page_title'] = $txt['ts_start_new_project'];
-		if (!TS_can_do('manage_all')) 
+		/*if (!TS_can_do('manage_all')) 
 		{
 			fatal_lang_error('ts_cannot_permission_generic');
-		}
+		}*/
 	}
 
 	else
 	{
 		$context['page_title'] = $txt['ts_start_new_suite'];
-		if (!TS_can_do('manage_all') || !TS_can_do('manage_project', $context['test_suite']['current_project'])) 
+		/*if (!TS_can_do('manage_all') || !TS_can_do('manage_project', $context['test_suite']['current_project'])) 
 		{
 			fatal_lang_error('ts_cannot_permission_generic');
-		}
+		}*/
 	}
 
 	// Call Our Sub-Template.
@@ -777,10 +781,10 @@ function TS_Cases()
 	$context['test_suite']['suite'] = TS_loadSuite($suite_id, false);
 
 	// Permissions...
-	if (!TS_can_do('manage_all') || !TS_can_do('manage_project', $context['test_suite']['current_project']) || !TS_can_do('manage_suite', $suite_id))
+	/*if (!TS_can_do('manage_all') || !TS_can_do('manage_project', $context['test_suite']['current_project']) || !TS_can_do('manage_suite', $suite_id))
 	{
 		fatal_lang_error('ts_cannot_permission_generic');
-	}
+	}*/
 	
 	TS_Validator('case');
 
@@ -999,11 +1003,11 @@ function TS_EditCase()
 	}
 	$context['id_assigned_list'] = empty($names) ? '' : '&quot;' . implode('&quot;, &quot;', $names) . '&quot;';
 
-	if (!($context['user']['is_admin'] || TS_can_do('manage_all') || TS_can_do('manage_project', $context['test_suite']['current_project']) || 
+	/*if (!($context['user']['is_admin'] || TS_can_do('manage_all') || TS_can_do('manage_project', $context['test_suite']['current_project']) || 
 			TS_can_do('manage_suite', $context['test_suite']['current_suite'])))
 	{
 		fatal_lang_error('ts_cannot_permission_generic');
-	}
+	}*/
 		
 	if (empty($context['post_errors']))
 	{
@@ -1096,10 +1100,10 @@ function TS_EditCase2()
 		$post_errors[] = 'session_timeout';
 
 	// !!! Incomplete, TBD.
-	if (!TS_can_do('manage_all'))
+	/*if (!TS_can_do('manage_all'))
 	{
 		fatal_lang_error('ts_cannot_permission_generic');
-	}
+	}*/
 
 	if (!empty($case_id))
 	{
@@ -1251,10 +1255,10 @@ function TS_PostRun()
 	$context['test_suite']['case'] = TS_loadCase($context['test_suite']['current_case'], false);
 
 	// Permissions.
-	if (!TS_can_do('postrun', array('id_proj' => $context['test_suite']['case']['id_project'], 'id_suite' => $context['test_suite']['case']['id_suite'])))
+	/*if (!TS_can_do('postrun', array('id_proj' => $context['test_suite']['case']['id_project'], 'id_suite' => $context['test_suite']['case']['id_suite'])))
 	{
 		fatal_lang_error('ts_cannot_permission_generic');
-	}
+	}*/
 
 	$id_bug = isset($_REQUEST['id_bug']) ? (int) $_REQUEST['id_bug'] : 0;
 
@@ -1311,14 +1315,14 @@ function TS_PostRun2()
 	$context['test_suite']['case'] = TS_loadCase($context['test_suite']['current_case'], false);
 
 	// Permissions.
-	if (!TS_can_do('postrun', array('id_proj' => $context['test_suite']['case']['id_project'], 'id_suite' => $context['test_suite']['case']['id_suite'])))
+	/*if (!TS_can_do('postrun', array('id_proj' => $context['test_suite']['case']['id_project'], 'id_suite' => $context['test_suite']['case']['id_suite'])))
 		fatal_lang_error('ts_cannot_permission_generic');
 
 	// Are we hacking?
 	if (empty($context['test_suite']['current_case']))
 	{
 		fatal_lang_error('ts_no_case');
-	}
+	}*/
 
 	$id_bug = isset($_REQUEST['id_bug']) ? (int) $_REQUEST['id_bug'] : 0;
 	$case_id = $context['test_suite']['current_case'];
@@ -1815,7 +1819,21 @@ function TS_CopyItem2()
 function TS_Admin()
 {
 	global $context, $txt, $sourcedir;
-	
+
+	require_once($sourcedir . '/Subs-Membergroups.php');
+	$context['test_suite']['groups'][-1] = array(
+		'id_group' => -1,
+		'group_name' => $txt['ts_guests'],
+	);
+	$context['test_suite']['groups'][0] = array(
+		'id_group' => 0,
+		'group_name' => $txt['ts_members'],
+	);
+	$context['test_suite']['groups'] += list_getMembergroups(null, null, 'id_group', 'regular');
+	// Ugly hardcoded hack to get rid of unwanted local moderator option.
+	unset($context['test_suite']['groups'][3]);
+	unset($context['test_suite']['groups'][1]);
+
 	$subActions = array(
 		'per_level' => 'TS_Admin_PerLevel',
 		'main' => 'TS_Admin_Main'
@@ -1864,21 +1882,7 @@ function TS_Admin_PerLevel()
 		'name' => $txt['ts_admin'],
 	);
 
-	require_once($sourcedir . '/Subs-Membergroups.php');
-	$context['test_suite']['groups'][-1] = array(
-		'id_group' => -1,
-		'group_name' => $txt['ts_guests'],
-	);
-	$context['test_suite']['groups'][0] = array(
-		'id_group' => 0,
-		'group_name' => $txt['ts_members'],
-	);
-	$context['test_suite']['groups'] += list_getMembergroups(null, null, 'id_group', 'regular');
-	// Ugly hardcoded hack to get rid of unwanted local moderator option.
-	unset($context['test_suite']['groups'][3]);
-	unset($context['test_suite']['groups'][1]);
-
-	$context['test_suite']['permissions'] = array();
+	//$context['test_suite']['permissions'] = array();
 	$context['test_suite']['perms'] = TS_load_permissions($context['test_suite']['permission']['level_name'], $context['test_suite']['permission']['id_level']);
 
 	if (isset($_POST['submit']))

@@ -517,6 +517,24 @@ $tables = array(
 			),
 		),
 	),
+    'testsuite_permission' => array(
+		'columns' => array(
+			array(
+				'name' => 'permission',
+				'type' => 'varchar',
+				'size' => 255,
+                'null' => false,
+				'default' => '',
+			),
+            array(
+				'name' => 'member_groups',
+				'type' => 'varchar',
+				'size' => 255,
+				'default' => '',
+			),
+		),
+        'indexes' => array(),
+	),
 );
 
 foreach ($tables as $table => $data)

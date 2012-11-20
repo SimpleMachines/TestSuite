@@ -145,6 +145,7 @@ $txt['ts_perm_groups_can_edit'] = 'Groups can Edit';
 $txt['ts_perm_groups_can_delete'] = 'Groups can Delete';
 $txt['ts_perm_groups_can_create'] = 'Groups can Create next level';
 
+$txt['ts_global_perm_create_project'] = 'Groups can create projects';
 // SM Test suite
 $txt['ts_error_no_name'] = 'Name field was left empty.';
 $txt['ts_error_no_description'] = 'Description field was left empty.';

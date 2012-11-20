@@ -1317,24 +1317,42 @@ function template_testsuite_admin()
 	</div>
 	<div class="suite_frame">';
 
-	echo '
-	<form action="', $context['test_suite']['url'], ';admin" method="post">';
 
-		echo '
-		<fieldset>
-			<legend>' . $txt['ts_perm_level'] . '</legend>';
-			foreach ($context['test_suite']['levels'] as $key => $level)
+	
+	echo '
+	<form action="', $context['test_suite']['url'], ';admin=main" method="post">';
+
+		foreach ($context['test_suite']['global_perms'] as $perm)
+		{
+				//echo $perm['permission'];
+				//echo $perm['member_groups'];
+				$perm['member_groups'] = $perm['member_groups'] == '' ? '' : explode(',', $perm['member_groups']);
+			echo ' <fieldset>';
+			echo '<legend>' . $txt['ts_global_perm_' . $perm['permission']] . '</legend>';
+
+			foreach ($context['test_suite']['groups'] as $group)
 			{
-				echo '<a href="', $context['test_suite']['url'], ';admin=per_level;level_name='. $level . '">', $txt['ts_perm_level_' . $level] ,'</a><br />';
+				echo '
+					<input' . (is_array($perm['member_groups']) && in_array($group['id_group'], $perm['member_groups']) ? ' checked="checked"' : '') . ' id="' . $group['id_group'] . '" type="checkbox" name="' . $perm['permission'] . '[]" value="' . $group['id_group'] . '" /> <label for="' . $group['id_group'] . '">' . $group['group_name'] . '</label><br />';
 			}
-		echo '
-		</fieldset>';
+			echo ' </fieldset>';
+		}
 
-	echo '
+		/*echo '
+		<input type="hidden" name="level_name" value="', $context['test_suite']['permission']['level_name'], '" />';*/
+
+		/*if (!empty($context['test_suite']['permission']['id_level']))
+		echo ' <input type="hidden" name="id_level" value="', $context['test_suite']['permission']['id_level'] , '" />';*/
+
+		echo '
 		<input type="submit" name="submit" value="', $txt['ts_submit'], '" tabindex="', $context['tabindex']++, '" class="button_submit" />';
 
 	echo '
 	</form>';
+
+
+
+
 
 	echo'
 	</div>';
