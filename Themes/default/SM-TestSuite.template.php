@@ -289,19 +289,37 @@ function template_sm_testsuite_case_view()
 		{
 			echo '
 					<li class="header">', $value['link'], '
-						<div class="floatright">
+						<div class="floatright">';
+
+						if($value['groups_can_edit']) {
+						echo '
 							<a class="active" href="', $context['test_suite']['url'], ';editcase='. $value['id'] . '">
 								<img src="' . $settings['images_url'] . '/buttons/sm_edit.png" alt="', $txt['ts_edit'], ' ', $txt['ts_case'], '" title="', $txt['ts_edit'], ' ', $txt['ts_case'], '" />
-							</a>
+							</a>';
+						}
+
+						if($value['groups_can_manage']) {
+						echo '
 							<a class="active" href="', $context['test_suite']['url'], ';copycase=', $value['id'], '">
 								<img src="' . $settings['images_url'] . '/buttons/sm_copy.png" alt="', $txt['ts_copy_case'], '" title="', $txt['ts_copy_case'], '" />
-							</a>
+							</a>';
+						}
+
+						if($value['groups_can_manage']) {
+						echo '
 							<a class="active" href="', $context['test_suite']['url'], ';admin=per_level;level_name=case;id_level='. $value['id'] . '">
 								<img src="' . $settings['images_url'] . '/buttons/sm_manage.png" alt="', $txt['ts_manage_case'], '" title="', $txt['ts_manage_case'], '" />
-							</a>
+							</a>';
+						}
+
+						if($value['groups_can_delete']) {
+						echo '
 							<a class="active" href="', $context['test_suite']['url'], ';removecase='. $value['id'] . '" onclick="return confirm(\'', $txt['ts_remove_case'], '?\');">
 								<img src="' . $settings['images_url'] . '/buttons/sm_delete.png" alt="', $txt['ts_remove_case'], '" title="', $txt['ts_remove_case'], '" />
-							</a>
+							</a>';
+						}
+
+						echo '
 						</div>
 					</li>';
 			echo '

@@ -181,7 +181,7 @@ function TS_loadProject($project_id, $load_suites = true)
 
 function TS_loadSuite($suite_id, $load_cases = true)
 {
-	global $smcFunc, $scripturl, $context;
+	global $smcFunc, $scripturl, $context, $user_info;
 
 	if (empty($suite_id))
 	{
@@ -227,9 +227,10 @@ function TS_loadSuite($suite_id, $load_cases = true)
 	if ($load_cases)
 	{
 	    $request = $smcFunc['db_query']('', '
-			SELECT c.id_case, c.id_suite, c.case_name, c.description, c.steps, c.expected_result, c.id_member, c.poster_name, c.poster_time, c.poster_email, c.id_assigned, c.modified_time, c.modified_by, count, c.fail_count
+			SELECT c.id_case, c.id_suite, c.case_name, c.description, c.steps, c.expected_result, c.id_member, c.poster_name, c.poster_time, c.poster_email, c.id_assigned, c.modified_time, c.modified_by, count, c.fail_count, c.groups_can_view, c.groups_can_manage, c.groups_can_edit, c.groups_can_delete
 			FROM {db_prefix}testsuite_cases as c
 			WHERE id_suite = {int:current_suite}
+			AND '. $context['TS_can_view_query'] .'
 			ORDER BY id_case',
 			array(
 				'current_suite' => $suite_id,
@@ -262,6 +263,9 @@ function TS_loadSuite($suite_id, $load_cases = true)
 				),
 				'modified_time' => timeformat($row['modified_time']),
 				'modified_by' => $row['modified_by'],
+				'groups_can_manage' => TS_is_user_allowed($user_info['groups'], $row['groups_can_manage']),
+				'groups_can_edit' => TS_is_user_allowed($user_info['groups'], $row['groups_can_edit']),
+				'groups_can_delete' => TS_is_user_allowed($user_info['groups'], $row['groups_can_delete']),
 			);
 		}
 		$smcFunc['db_free_result']($request);
@@ -1372,12 +1376,11 @@ function TS_load_permissions($level_name = false, $id_level = false)
 	if(!$level_name)
 		return;
 
-
 	$request = $smcFunc['db_query']('', '
 			SELECT p.groups_can_view, p.groups_can_manage, p.groups_can_edit, p.groups_can_delete
 			FROM {db_prefix}testsuite_' . $level_name . 's as p ' . ($id_level ? '
 			WHERE p.id_' . $level_name . ' = {int:id_level}' : '') .'
-			ORDER BY p.id_project ASC',
+			ORDER BY p.id_' . $level_name . ' ASC',
 			array(
 					'id_level' => $id_level,
 			)
