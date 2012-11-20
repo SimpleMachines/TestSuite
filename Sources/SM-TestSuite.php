@@ -270,12 +270,16 @@ function TS_ShowCurrentCase()
 		'extra_after' => '<span' . ($settings['linktree_inline'] ?
 			' class="smalltext"' : '') . '><strong class="nav"> )</strong></span>'
 	);
-	$context['test_suite']['buttons'] = array(
-		array(
-			'href' => $context['test_suite']['url'] . ';createrun;c=' . $context['test_suite']['current_case'],
-			'name' => $txt['ts_submit_run_result'],
-		),
-	);
+
+	if($context['test_suite']['case']['groups_can_create']) {
+		$context['test_suite']['buttons'] = array(
+			array(
+				'href' => $context['test_suite']['url'] . ';createrun;c=' . $context['test_suite']['current_case'],
+				'name' => $txt['ts_submit_run_result'],
+			),
+		);
+	}
+
 	$context['test_suite']['edit_link'] = '<a class="smalltext" href="' . $context['test_suite']['url'] . ';editcase=' . $context['test_suite']['current_case'] . '">[' . $txt['ts_edit'] . ']</a>';
 	$context['sub_template'] = 'sm_testsuite_separate_case_view';
 }

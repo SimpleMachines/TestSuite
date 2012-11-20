@@ -287,11 +287,11 @@ function TS_loadSuite($suite_id, $load_cases = true)
  */
 function TS_loadCase($case_id, $load_runs = true)
 {
-	global $smcFunc, $scripturl, $context, $memberContext;
+	global $smcFunc, $scripturl, $context, $memberContext, $user_info;
 	
 	// Load just the current case.
 	$request = $smcFunc['db_query']('', '
-		SELECT c.id_case, p.project_name, p.id_project, c.id_suite, s.suite_name, c.case_name, c.description, c.steps, c.expected_result, c.id_member, c.poster_name, c.poster_time, c.poster_email, c.id_assigned, c.modified_time, c.modified_by, c.count, c.fail_count
+		SELECT c.id_case, p.project_name, p.id_project, c.id_suite, s.suite_name, c.case_name, c.description, c.steps, c.expected_result, c.id_member, c.poster_name, c.poster_time, c.poster_email, c.id_assigned, c.modified_time, c.modified_by, c.count, c.fail_count, c.groups_can_create
 		FROM {db_prefix}testsuite_cases as c
 		INNER JOIN {db_prefix}testsuite_suites as s ON (c.id_suite = s.id_suite)
 		INNER JOIN {db_prefix}testsuite_projects as p ON (s.id_project = p.id_project)
@@ -334,6 +334,7 @@ function TS_loadCase($case_id, $load_runs = true)
 			),
 			'modified_time' => timeformat($row['modified_time']),
 			'modified_by' => $row['modified_by'],
+			'groups_can_create' => TS_is_user_allowed($user_info['groups'], $row['groups_can_create']),
 			'runs' => array(),
 		);
 	}
