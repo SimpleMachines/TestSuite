@@ -153,12 +153,16 @@ function TS_ShowCurrentProject()
 
 	// If the project is invalid, the function called will take care of it.
 	$context['test_suite']['project'] = TS_loadProject($context['test_suite']['current_project']);
-	$context['test_suite']['buttons'] = array(
-		array(
-			'href' => $context['test_suite']['url'] . ';createsuite;proj=' . $context['test_suite']['current_project'] . '',
-			'name' => $txt['ts_create_suite'],
-		)
-	);
+
+	$context['test_suite']['buttons'] = array();
+	if($context['test_suite']['project']['groups_can_create']) {
+		$context['test_suite']['buttons'] = array(
+			array(
+				'href' => $context['test_suite']['url'] . ';createsuite;proj=' . $context['test_suite']['current_project'] . '',
+				'name' => $txt['ts_create_suite'],
+			)
+		);
+	}
 
 	// While it is good to separate template code from source, occassionly it is good be able to simplify the template code
 	//and let the template designer know that there is a generic variable they can test for that the developer may add in the future
@@ -214,12 +218,16 @@ function TS_ShowCurrentSuite()
 			' class="smalltext"' : '') . '><strong class="nav"> )</strong></span>'
 	);
 	$context['test_suite']['edit_link'] = '<a class="smalltext" href="' . $context['test_suite']['url'] . ';editsuite=' . $context['test_suite']['current_suite'] . '">[' . $txt['ts_edit'] . ']</a>';
-	$context['test_suite']['buttons'] = array(
-		array(
-			'href' => $context['test_suite']['url'] . ';createcase;s=' . $context['test_suite']['current_suite'],
-			'name' => $txt['ts_create_case'],
-		),
-	);
+
+	$context['test_suite']['buttons'] = array();
+	if($context['test_suite']['suite']['groups_can_create']) {
+		$context['test_suite']['buttons'] = array(
+			array(
+				'href' => $context['test_suite']['url'] . ';createcase;s=' . $context['test_suite']['current_suite'],
+				'name' => $txt['ts_create_case'],
+			)
+		);
+	}
 }
 
 /**
@@ -1878,6 +1886,7 @@ function TS_Admin_PerLevel()
 		$context['test_suite']['database']['groups_can_manage'] = isset($_POST['groups_can_manage']) && !empty($_POST['groups_can_manage']) ? implode(",", $_POST['groups_can_manage']) : '';
 		$context['test_suite']['database']['groups_can_edit'] = isset($_POST['groups_can_edit']) && !empty($_POST['groups_can_edit']) ? implode(",", $_POST['groups_can_edit']) : '';
 		$context['test_suite']['database']['groups_can_delete'] = isset($_POST['groups_can_delete']) && !empty($_POST['groups_can_delete']) ? implode(",", $_POST['groups_can_delete']) : '';
+		$context['test_suite']['database']['groups_can_create'] = isset($_POST['groups_can_create']) && !empty($_POST['groups_can_create']) ? implode(",", $_POST['groups_can_create']) : '';
 
 		TS_updatePermissions($context['test_suite']['database']);
 		redirectexit('action=testsuite;admin=per_level;level_name='. $context['test_suite']['permission']['level_name'] .';id_level='.$context['test_suite']['permission']['id_level']);

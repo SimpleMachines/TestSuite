@@ -157,8 +157,13 @@ function template_sm_testsuite_project_view()
 		<div class="suite_frame">';
 		if (empty($context['test_suite']['project']['suites']))
 		{
-			echo '
-		<div class="error">' . $txt['ts_no_loaded_suites'] . '</div>';
+			if($context['test_suite']['project']['groups_can_create']) {
+				echo '
+				<div class="error">' . $txt['ts_no_loaded_suites_create'] . '</div>';
+			} else {
+				echo '
+				<div class="error">' . $txt['ts_no_loaded_suites'] . '</div>';
+			}
 		}
 		foreach ($context['test_suite']['project']['suites'] as $key => $value)
 		{
@@ -280,8 +285,14 @@ function template_sm_testsuite_case_view()
 		<div class="suite_frame">';
 		if (empty($context['test_suite']['suite']['cases']))
 		{
-			echo '
+			
+			if($context['test_suite']['suite']['groups_can_create']) {
+				echo '
+				<div class="error">' . $txt['ts_no_loaded_cases_create'] . '</div>';
+			} else {
+				echo '
 				<div class="error">' . $txt['ts_no_loaded_cases'] . '</div>';
+			}
 		}
 		echo '
 				<ul>';
@@ -1349,7 +1360,7 @@ function template_testsuite_admin_per_level()
 
 	echo '
 	<form action="', $context['test_suite']['url'], ';admin=per_level;level_name='. $context['test_suite']['permission']['level_name'] . '" method="post">';
-	
+
 		foreach ($context['test_suite']['perms'] as $key => $perm)
 		{
 				$perm = $perm == '' ? '' : explode(',', $perm);

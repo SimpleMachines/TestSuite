@@ -81,7 +81,7 @@ function TS_loadProject($project_id, $load_suites = true)
 	}
 
 	$request = $smcFunc['db_query']('', '
-		SELECT p.id_project, p.project_name, p.description, p.id_member, p.poster_name, p.poster_time, p.poster_email, p.modified_time, p.modified_by
+		SELECT p.id_project, p.project_name, p.description, p.id_member, p.poster_name, p.poster_time, p.poster_email, p.modified_time, p.modified_by, p.groups_can_create
 		FROM {db_prefix}testsuite_projects as p
 		WHERE id_project = {int:current_project}
 		LIMIT 1',
@@ -114,6 +114,7 @@ function TS_loadProject($project_id, $load_suites = true)
 			),
 			'modified_time' => timeformat($row['modified_time']),
 			'modified_by' => $row['modified_by'],
+			'groups_can_create' => TS_is_user_allowed($user_info['groups'], $row['groups_can_create']),
 			'suites' => array(),
 		);
 	}
@@ -192,7 +193,7 @@ function TS_loadSuite($suite_id, $load_cases = true)
 
 	// Load just the one suite that we are on. Don't need to load all suites when we don't need them.
 	$request = $smcFunc['db_query']('', '
-		SELECT p.id_project, p.project_name, s.id_suite, s.suite_name, s.description
+		SELECT p.id_project, p.project_name, s.id_suite, s.suite_name, s.description, s.groups_can_create
 		FROM {db_prefix}testsuite_suites as s
 		INNER JOIN {db_prefix}testsuite_projects as p ON p.id_project = s.id_project
 		WHERE s.id_suite = {int:current_suite}
@@ -212,6 +213,7 @@ function TS_loadSuite($suite_id, $load_cases = true)
 			'name' => $row['suite_name'],
 			'description' => $row['description'], 
 			'link' => '<a href="' . $context['test_suite']['url'] . ';suite=' . $row['id_suite'] . '" target="_self">' . $row['suite_name'] . '</a>',
+			'groups_can_create' => TS_is_user_allowed($user_info['groups'], $row['groups_can_create']),
 			'cases' => array(),
 		);
 	}
@@ -1377,7 +1379,7 @@ function TS_load_permissions($level_name = false, $id_level = false)
 		return;
 
 	$request = $smcFunc['db_query']('', '
-			SELECT p.groups_can_view, p.groups_can_manage, p.groups_can_edit, p.groups_can_delete
+			SELECT p.groups_can_view, p.groups_can_manage, p.groups_can_edit, p.groups_can_delete, p.groups_can_create
 			FROM {db_prefix}testsuite_' . $level_name . 's as p ' . ($id_level ? '
 			WHERE p.id_' . $level_name . ' = {int:id_level}' : '') .'
 			ORDER BY p.id_' . $level_name . ' ASC',
@@ -1394,6 +1396,7 @@ function TS_load_permissions($level_name = false, $id_level = false)
 			'groups_can_manage' => $row['groups_can_manage'],
 			'groups_can_edit' => $row['groups_can_edit'],
 			'groups_can_delete' => $row['groups_can_delete'],
+			'groups_can_create' => $row['groups_can_create'],
 		);
 	}
 	$smcFunc['db_free_result']($request);
@@ -1467,7 +1470,7 @@ function TS_updatePermissions($perms)
 
 		$smcFunc['db_query']('', '
 				UPDATE {db_prefix}testsuite_' . $context['test_suite']['database']['level_name'] . 's
-				SET groups_can_view = {string:can_view_list}, groups_can_manage = {string:can_manage_list}, groups_can_edit = {string:can_edit_list}, groups_can_delete = {string:can_delete_list}
+				SET groups_can_view = {string:can_view_list}, groups_can_manage = {string:can_manage_list}, groups_can_edit = {string:can_edit_list}, groups_can_delete = {string:can_delete_list}, groups_can_create = {string:can_create_list}
 				WHERE id_'.$context['test_suite']['database']['level_name'].' = {int:id_map}',
 				array(
 						'id_map' => $context['test_suite']['database']['id_level'],
@@ -1475,6 +1478,7 @@ function TS_updatePermissions($perms)
 					'can_manage_list' => $context['test_suite']['database']['groups_can_manage'],
 					'can_edit_list' => $context['test_suite']['database']['groups_can_edit'],
 					'can_delete_list' => $context['test_suite']['database']['groups_can_delete'],
+					'can_create_list' => $context['test_suite']['database']['groups_can_create'],
 				)
 			);
 }
@@ -1485,7 +1489,7 @@ function TS_clearPermissions($level_name, $id_level = false)
 
 		$smcFunc['db_query']('', '
 				UPDATE {db_prefix}testsuite_'. $level_name .'s
-				SET groups_can_view = {string:blank_string}, groups_can_manage = {string:blank_string}, groups_can_edit = {string:blank_string}, groups_can_delete = {string:blank_string}
+				SET groups_can_view = {string:blank_string}, groups_can_manage = {string:blank_string}, groups_can_edit = {string:blank_string}, groups_can_delete = {string:blank_string}, groups_can_create = {string:blank_string}
 				WHERE id_'. $level_name .' = {int:id_level}',
 				array(
 						'id_level' => $id_level,

@@ -36,8 +36,10 @@ $txt['ts_project_description'] = 'Description';
 $txt['ts_back_to_project'] = 'Back to Project';
 $txt['ts_last_edit_by'] = 'Last edited by';
 $txt['ts_no_loaded_projects'] = 'There appear to be no projects available. You can create one by selecting "Create Project".';
-$txt['ts_no_loaded_suites'] = 'There appear to be no suites available. You can create one by selecting "Create Suite".';
-$txt['ts_no_loaded_cases'] = 'There appear to be no cases available. You can create one by selecting "Create Case".';
+$txt['ts_no_loaded_suites_create'] = 'There appear to be no suites available. You can create one by selecting "Create Suite".';
+$txt['ts_no_loaded_suites'] = 'There appear to be no suites available.';
+$txt['ts_no_loaded_cases_create'] = 'There appear to be no cases available. You can create one by selecting "Create Case".';
+$txt['ts_no_loaded_cases'] = 'There appear to be no cases available';
 $txt['ts_no_project'] = 'Sorry, the project specified could not be found.';
 $txt['ts_manage_project'] = 'Manage Project';
 
@@ -141,6 +143,7 @@ $txt['ts_perm_groups_can_view'] = 'Groups can View';
 $txt['ts_perm_groups_can_manage'] = 'Groups can Manage';
 $txt['ts_perm_groups_can_edit'] = 'Groups can Edit';
 $txt['ts_perm_groups_can_delete'] = 'Groups can Delete';
+$txt['ts_perm_groups_can_create'] = 'Groups can Create next level';
 
 // SM Test suite
 $txt['ts_error_no_name'] = 'Name field was left empty.';
