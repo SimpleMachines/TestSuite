@@ -51,9 +51,9 @@ function TS_requestProjects()
 			),
 			'modified_time' => timeformat($row['modified_time']),
 			'modified_by' => $row['modified_by'],
-			'groups_can_manage' => TS_is_user_allowed($user_info, $row['groups_can_manage']),
-			'groups_can_edit' => TS_is_user_allowed($user_info, $row['groups_can_edit']),
-			'groups_can_delete' => TS_is_user_allowed($user_info, $row['groups_can_delete']),
+			'groups_can_manage' => TS_is_user_allowed($user_info['groups'], $row['groups_can_manage']),
+			'groups_can_edit' => TS_is_user_allowed($user_info['groups'], $row['groups_can_edit']),
+			'groups_can_delete' => TS_is_user_allowed($user_info['groups'], $row['groups_can_delete']),
 		);
 	}
 	$smcFunc['db_free_result']($request);
@@ -73,7 +73,7 @@ function TS_requestProjects()
  */
 function TS_loadProject($project_id, $load_suites = true)
 {
-	global $smcFunc, $scripturl, $context, $txt;
+	global $smcFunc, $scripturl, $context, $txt, $user_info;
 
 	if (empty($project_id))
 	{
@@ -124,9 +124,10 @@ function TS_loadProject($project_id, $load_suites = true)
 	{
 	    // Grab the sweets from the candy store, depending on the ID of the project.
 	    $request = $smcFunc['db_query']('', '
-			SELECT s.id_suite, s.id_project, s.suite_name, s.description, s.id_member, s.poster_name, s.poster_time, s.poster_email, s.count, s.fail_count, s.modified_time, s.modified_by
+			SELECT s.id_suite, s.id_project, s.suite_name, s.description, s.id_member, s.poster_name, s.poster_time, s.poster_email, s.count, s.fail_count, s.modified_time, s.modified_by, s.groups_can_view, s.groups_can_manage, s.groups_can_edit, s.groups_can_delete
 			FROM {db_prefix}testsuite_suites as s
 			WHERE id_project = {int:current_project}
+			AND '. $context['TS_can_view_query'] .'
 			ORDER BY id_suite',
 			array(
 				'current_project' => $project_id,
@@ -156,6 +157,9 @@ function TS_loadProject($project_id, $load_suites = true)
 					),
 					'modified_time' => timeformat($row['modified_time']),
 					'modified_by' => $row['modified_by'],
+					'groups_can_manage' => TS_is_user_allowed($user_info['groups'], $row['groups_can_manage']),
+					'groups_can_edit' => TS_is_user_allowed($user_info['groups'], $row['groups_can_edit']),
+					'groups_can_delete' => TS_is_user_allowed($user_info['groups'], $row['groups_can_delete']),
 				);
 		}
 
@@ -1368,30 +1372,17 @@ function TS_load_permissions($level_name = false, $id_level = false)
 	if(!$level_name)
 		return;
 
-	/*$perms = array(
-		// Guests and regular members.
-		'view_all' => false,
-		'manage_all' => false,
-		'postruns_all' => false,
-		// Test for whether the user belongs to a group that can submit runs for various test cases.
-		'postruns_suite' => false,
-		'postruns_proj' => false,
-		// Manage permission includes: run creation/modification/deletion, suite and case creating/modifying/deleting/moving
-		'manage_project' => false,
-		'manage_suite' => false,
-	);*/
 
-	if($level_name == 'project') {
-		$request = $smcFunc['db_query']('', '
-				SELECT p.groups_can_view, p.groups_can_manage, p.groups_can_edit, p.groups_can_delete
-				FROM {db_prefix}testsuite_projects as p ' . ($id_level ? '
-				WHERE p.id_project = {int:id_level}' : '') .'
-				ORDER BY p.id_project ASC',
-				array(
-						'id_level' => $id_level,
-				)
-			);
-	}
+	$request = $smcFunc['db_query']('', '
+			SELECT p.groups_can_view, p.groups_can_manage, p.groups_can_edit, p.groups_can_delete
+			FROM {db_prefix}testsuite_' . $level_name . 's as p ' . ($id_level ? '
+			WHERE p.id_' . $level_name . ' = {int:id_level}' : '') .'
+			ORDER BY p.id_project ASC',
+			array(
+					'id_level' => $id_level,
+			)
+		);
+
 
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
@@ -1897,7 +1888,7 @@ function TS_is_user_allowed($array, $string, $delim=',') {
 		return true;
 	}
 
-	$stringAsArray = explode($inDelim, $string);
+	$stringAsArray = explode($delim, $string);
 	if(count(array_intersect($array, $stringAsArray))>0)
 	{
 		return true;

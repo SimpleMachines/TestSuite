@@ -165,19 +165,37 @@ function template_sm_testsuite_project_view()
 			echo '
 			<ul>
 				<li class="header">', $value['link'], '
-					<div class="floatright">
+					<div class="floatright">';
+
+					if($value['groups_can_edit']) {
+					echo '
 						<a class ="active" href="', $context['test_suite']['url'], ';editsuite='. $value['id'] . '">
 							<img src="' . $settings['images_url'] . '/buttons/sm_edit.png" alt="', $txt['ts_edit_suite'], '" title="', $txt['ts_edit_suite'], '" />
-						</a>
+						</a>';
+					}
+
+					if($value['groups_can_manage']) {
+						echo '
 						<a class="active" href="', $context['test_suite']['url'], ';copysuite=', $value['id'], '">
 							<img src="' . $settings['images_url'] . '/buttons/sm_copy.png" alt="', $txt['ts_copy_suite'], '" title="', $txt['ts_copy_suite'], '" />
-						</a>
+						</a>';
+					}
+
+					if($value['groups_can_manage']) {
+					echo '
 						<a class="active" href="', $context['test_suite']['url'], ';admin=per_level;level_name=suite;id_level='. $value['id'] . '">
 							<img src="' . $settings['images_url'] . '/buttons/sm_manage.png" alt="', $txt['ts_manage_suite'], '" title="', $txt['ts_manage_suite'], '" />
-						</a>
+						</a>';
+					}
+
+					if($value['groups_can_delete']) {
+						echo '
 						<a class ="active" href="', $context['test_suite']['url'], ';removesuite='. $value['id'] . '" onclick="return confirm(\'', $txt['ts_remove_suite'], '?\');">
 								<img src="' . $settings['images_url'] . '/buttons/sm_delete.png" alt="', $txt['ts_remove_suite'], '" title="', $txt['ts_remove_suite'], '" />
-						</a>
+						</a>';
+					}
+
+					echo '
 					</div>
 				</li>';
 
