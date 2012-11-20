@@ -80,19 +80,37 @@ function template_main()
 		echo '
 			<li class="header">
 				', $value['link'], '
-				<div class="floatright">
+				<div class="floatright">';
+
+				if($value['groups_can_edit']) {
+				echo '
 					<a class="active" href="', $context['test_suite']['url'], ';editproject=', $value['id'], '">
 						<img src="' . $settings['images_url'] . '/buttons/sm_edit.png" alt="', $txt['ts_edit_project'], '" title="', $txt['ts_edit_project'], '" />
-					</a>
+					</a>';
+				}
+
+				if($value['groups_can_manage']) {
+					echo '
 					<a class="active" href="', $context['test_suite']['url'], ';copyproject=', $value['id'], '">
 						<img src="' . $settings['images_url'] . '/buttons/sm_copy.png" alt="', $txt['ts_copy_project'], '" title="', $txt['ts_copy_project'], '" />
-					</a>
+					</a>';
+				}
+
+				if($value['groups_can_manage']) {
+				echo '
 					<a class="active" href="', $context['test_suite']['url'], ';admin=per_level;level_name=project;id_level='. $value['id'] . '">
 						<img src="' . $settings['images_url'] . '/buttons/sm_manage.png" alt="', $txt['ts_manage_project'], '" title="', $txt['ts_manage_project'], '" />
-					</a>
+					</a>';
+				}
+
+				if($value['groups_can_delete']) {
+					echo '
 					<a class="active" href="', $context['test_suite']['url'], ';removeproject='. $value['id'] . '" onclick="return confirm(\'', $txt['ts_remove_project'], '?\');">
 						<img src="' . $settings['images_url'] . '/buttons/sm_delete.png" alt="', $txt['ts_remove_project'], '" title="', $txt['ts_remove_project'], '" />
-					</a>
+					</a>';
+				}
+
+				echo '
 				</div>
 			</li>';
 

@@ -51,6 +51,9 @@ function TS_requestProjects()
 			),
 			'modified_time' => timeformat($row['modified_time']),
 			'modified_by' => $row['modified_by'],
+			'groups_can_manage' => TS_is_user_allowed($user_info, $row['groups_can_manage']),
+			'groups_can_edit' => TS_is_user_allowed($user_info, $row['groups_can_edit']),
+			'groups_can_delete' => TS_is_user_allowed($user_info, $row['groups_can_delete']),
 		);
 	}
 	$smcFunc['db_free_result']($request);
@@ -1878,6 +1881,29 @@ function TS_level_permission($action = false, $level_name = false, $id_level = f
 		//print_r($id_level);
 		//die();
 		return $id_level;
+}
+
+
+/**
+ * Used to checks whether string value exist in array or not.
+ * @array $array contains the array to check against
+ * @string $string is the string that has to be checked
+ * @delimiter $delim seeks the string delimiter
+ */
+function TS_is_user_allowed($array, $string, $delim=',') {
+	global $user_info;
+
+	if($user_info['is_admin']) {
+		return true;
+	}
+
+	$stringAsArray = explode($inDelim, $string);
+	if(count(array_intersect($array, $stringAsArray))>0)
+	{
+		return true;
+	} else {
+		return false;
+	}
 }
 
 ?>
