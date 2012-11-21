@@ -29,12 +29,6 @@ function TS_SMTestSuiteMain()
 	loadTemplate('SM-TestSuite');
 	loadLanguage('SM-TestSuite');
 
-	if($user_info['is_admin']) {
-		$context['TS_can_view_query'] = '1=1';
-	} else {
-		$context['TS_can_view_query'] = '(FIND_IN_SET(' . implode(', groups_can_view) != 0 OR FIND_IN_SET(', $user_info['groups']) . ', groups_can_view) != 0' . ')';
-	}
-
 	$context['test_suite'] = array(
 		'current_project' => isset($_REQUEST['project']) ? (int) $_REQUEST['project'] : 0,
 		'current_suite' => isset($_REQUEST['suite']) ? (int) $_REQUEST['suite'] : 0,
@@ -58,6 +52,14 @@ function TS_SMTestSuiteMain()
 
 	//Lets see how many supermans power user has
 	$context['test_suite']['user_global_perms'] = TS_load_global_user_permissions();
+
+	//print_r($context['test_suite']['user_global_perms']);
+	//Well TS has its own admins too
+    if($user_info['is_admin'] || isset($context['test_suite']['user_global_perms']['allowed_to_administrate'])) {
+		$context['TS_can_view_query'] = '1=1';
+	} else {
+		$context['TS_can_view_query'] = '(FIND_IN_SET(' . implode(', groups_can_view) != 0 OR FIND_IN_SET(', $user_info['groups']) . ', groups_can_view) != 0' . ')';
+	}
 
 	/*if(!TS_can_do('view', 'project')) {
 		fatal_lang_error('ts_cannot_permission_generic');

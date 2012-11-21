@@ -1943,7 +1943,20 @@ function TS_clearGlobalPermissions()
 function TS_load_global_user_permissions() {
 	global $context, $smcFunc, $user_info;
 
-	if($user_info['is_admin']) {
+	//Lets see if user can admin TS
+	$request = $smcFunc['db_query']('', '
+		SELECT permission, member_groups
+		FROM {db_prefix}testsuite_global_permissions
+		WHERE permission = {string:can_admin_ts}
+		AND (FIND_IN_SET(' . implode(', member_groups) != 0 OR FIND_IN_SET(', $user_info['groups']) . ', member_groups) != 0' . ')',
+		array(
+				'can_admin_ts' => 'allowed_to_administrate'
+		)
+	);
+	list($isAllowedToAdmin) = $smcFunc['db_fetch_row']($request);
+	$smcFunc['db_free_result']($request);
+
+	if($user_info['is_admin'] || $isAllowedToAdmin) {
 		$TS_can_do = '1=1';
 	} else {
 		$TS_can_do = '(FIND_IN_SET(' . implode(', member_groups) != 0 OR FIND_IN_SET(', $user_info['groups']) . ', member_groups) != 0' . ')';
@@ -1971,9 +1984,9 @@ function TS_load_global_user_permissions() {
  * @delimiter $delim seeks the string delimiter
  */
 function TS_is_user_allowed($array, $string, $delim=',') {
-	global $user_info;
+	global $context, $user_info;
 
-	if($user_info['is_admin']) {
+	if($user_info['is_admin'] || isset($context['test_suite']['user_global_perms']['allowed_to_administrate'])) {
 		return true;
 	}
 

@@ -556,6 +556,8 @@ $smcFunc['db_add_column']('{db_prefix}members', $column);
 
 $default_global_perms = array(
 	array('permission' => 'create_new_projects', 'member_groups' => ''),
+	array('permission' => 'view_all_runs', 'member_groups' => ''),
+	array('permission' => 'allowed_to_administrate', 'member_groups' => ''),
 );
 
 foreach ($default_global_perms as $perm)
