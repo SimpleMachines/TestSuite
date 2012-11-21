@@ -553,6 +553,26 @@ $column = array(
 
 $smcFunc['db_add_column']('{db_prefix}members', $column);
 
+
+$default_global_perms = array(
+	array('permission' => 'create_new_projects', 'member_groups' => ''),
+);
+
+foreach ($default_global_perms as $perm)
+{
+	// Insert the Project.
+	$smcFunc['db_insert']('',
+		'{db_prefix}testsuite_permission',
+		array(
+			'permission' => 'string-255', 'member_groups' => 'string-255',
+		),
+		array(
+			$perm['permission'], $perm['member_groups'],
+		),
+		array('')
+	);
+}
+
 add_integration_function('integrate_pre_include', $sourcedir . '/Hooks-SM-TestSuite.php', true);
 add_integration_function('integrate_actions', 'TS_AddAction', true);
 add_integration_function('integrate_menu_buttons', 'TS_AddToMenu', true);
