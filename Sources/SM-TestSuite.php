@@ -34,7 +34,6 @@ function TS_SMTestSuiteMain()
 		'current_suite' => isset($_REQUEST['suite']) ? (int) $_REQUEST['suite'] : 0,
 		'current_case' => isset($_REQUEST['case']) ? (int) $_REQUEST['case'] : 0,
 		'current_run' => isset($_REQUEST['run']) ? (int) $_REQUEST['run'] : 0,
-		//'perms' => TS_load_permissions(),
 		'url' => $scripturl . '?action=testsuite',
 		'project_list' => TS_simple_GetProjects(),
 		'project_selected' => TS_load_user_Project(),
@@ -53,17 +52,12 @@ function TS_SMTestSuiteMain()
 	//Lets see how many supermans power user has
 	$context['test_suite']['user_global_perms'] = TS_load_global_user_permissions();
 
-	//print_r($context['test_suite']['user_global_perms']);
 	//Well TS has its own admins too
     if($user_info['is_admin'] || isset($context['test_suite']['user_global_perms']['allowed_to_administrate'])) {
 		$context['TS_can_view_query'] = '1=1';
 	} else {
 		$context['TS_can_view_query'] = '(FIND_IN_SET(' . implode(', groups_can_view) != 0 OR FIND_IN_SET(', $user_info['groups']) . ', groups_can_view) != 0' . ')';
 	}
-
-	/*if(!TS_can_do('view', 'project')) {
-		fatal_lang_error('ts_cannot_permission_generic');
-	}*/
 
 	// Add a link to the Christmas tree!
 	$context['linktree'][] = array(
@@ -1909,7 +1903,7 @@ function TS_Admin_PerLevel()
 	);
 
 	//$context['test_suite']['permissions'] = array();
-	$context['test_suite']['perms'] = TS_load_permissions($context['test_suite']['permission']['level_name'], $context['test_suite']['permission']['id_level']);
+	$context['test_suite']['perms'] = TS_load_level_permissions($context['test_suite']['permission']['level_name'], $context['test_suite']['permission']['id_level']);
 
 	if (isset($_POST['submit']))
 	{
@@ -1922,7 +1916,7 @@ function TS_Admin_PerLevel()
 		$context['test_suite']['database']['groups_can_delete'] = isset($_POST['groups_can_delete']) && !empty($_POST['groups_can_delete']) ? implode(",", $_POST['groups_can_delete']) : '';
 		$context['test_suite']['database']['groups_can_create'] = isset($_POST['groups_can_create']) && !empty($_POST['groups_can_create']) ? implode(",", $_POST['groups_can_create']) : '';
 
-		TS_updatePermissions($context['test_suite']['database']);
+		TS_updateLevelPermissions($context['test_suite']['database']);
 		redirectexit('action=testsuite;admin=per_level;level_name='. $context['test_suite']['permission']['level_name'] .';id_level='.$context['test_suite']['permission']['id_level']);
 	}
 }

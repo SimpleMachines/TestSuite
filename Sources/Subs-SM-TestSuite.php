@@ -133,9 +133,11 @@ function TS_loadProject($project_id, $load_suites = true)
 			FROM {db_prefix}testsuite_suites as s
 			WHERE id_project = {int:current_project}
 			AND '. $context['TS_can_view_query'] .'
+			OR s.id_member = {int:id_member}
 			ORDER BY id_suite',
 			array(
 				'current_project' => $project_id,
+				'id_member' => $user_info['id']
 			)
 		);
 		while ($row = $smcFunc['db_fetch_assoc']($request))
@@ -237,6 +239,7 @@ function TS_loadSuite($suite_id, $load_cases = true)
 			FROM {db_prefix}testsuite_cases as c
 			WHERE id_suite = {int:current_suite}
 			AND '. $context['TS_can_view_query'] .'
+			OR c.id_member = {int:id_member}
 			ORDER BY id_case',
 			array(
 				'current_suite' => $suite_id,
@@ -995,23 +998,6 @@ function TS_copyCase($casesData, $copy_level = 0)
 		$cases[$key]['id_case_inserted'] = $smcFunc['db_insert_id']('{db_prefix}testsuite_cases', 'case');
 		//$context['id_case_inserted'] = $smcFunc['db_insert_id']('{db_prefix}testsuite_cases', 'case');
 	}
-	/*if ($copy_level > 0)
-	{
-		$run_ids = array();
-		$case_loaded = TS_loadCase($case['id_case']);
-
-		if (empty($case_loaded['runs']))
-		return false;
-
-		else
-		{
-			foreach ($case_loaded['runs'] as $run)
-			{
-				$run_ids[] = $run['id'];
-			}
-			TS_copyRun($run_ids);
-		}
-	}*/
 	if ($copy_level > 0)
 	{
 		$runs_data = array();
@@ -1147,6 +1133,119 @@ function TS_copyRun($runs_data)
 		$context['id_run_inserted'] = $smcFunc['db_insert_id']('{db_prefix}testsuite_runs', 'run');
 	}
 	recountSuitesRuns();
+}
+
+function recountSuitesRuns() {
+	global $smcFunc, $scripturl, $context, $txt;
+	
+	$request = $smcFunc['db_query']('', '
+		SELECT id_suite
+		FROM {db_prefix}testsuite_suites
+		ORDER BY id_suite'
+	);
+
+	$idSuites = array();
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+	{
+		$idSuites[] = $row['id_suite'];
+	}
+	$smcFunc['db_free_result']($request);
+
+	foreach($idSuites as $key => $idSuite) {
+		$request = $smcFunc['db_query']('', '
+			select count(r.id_run) from smf_testsuite_runs as r
+			INNER JOIN smf_testsuite_cases AS c ON (r.id_case = c.id_case)
+			INNER JOIN smf_testsuite_suites as s ON (c.id_suite = s.id_suite)
+			where s.id_suite = {int:id_suite}',
+			array(
+				'id_suite' => $idSuite,
+			)
+		);
+		list ($total_num_runs) = $smcFunc['db_fetch_row']($request);
+		$smcFunc['db_free_result']($request);
+
+		$request1 = $smcFunc['db_query']('', '
+			select count(r.id_run) from smf_testsuite_runs as r
+			INNER JOIN smf_testsuite_cases AS c ON (r.id_case = c.id_case)
+			INNER JOIN smf_testsuite_suites as s ON (c.id_suite = s.id_suite)
+			where s.id_suite = {int:id_suite}
+			AND r.result_achieved = {string:result}',
+			array(
+				'id_suite' => $idSuite,
+				'result' => 'fail',
+			)
+		);
+		list ($num_runs_failed) = $smcFunc['db_fetch_row']($request1);
+		$smcFunc['db_free_result']($request1);
+
+		//echo $num_runs . '<br />';
+		$smcFunc['db_query']('', '
+			UPDATE {db_prefix}testsuite_suites
+			SET count = {int:total_num_runs}, fail_count = {int:num_runs_failed}
+			WHERE id_suite = {int:id_suite}',
+				array(
+					'total_num_runs' => $total_num_runs,
+					'num_runs_failed' => $num_runs_failed,
+					'id_suite' => $idSuite,
+				)
+		);
+	}
+	recountCasesRuns();
+}
+
+function recountCasesRuns() {
+	global $smcFunc, $scripturl, $context, $txt;
+	
+	$request = $smcFunc['db_query']('', '
+		SELECT id_case
+		FROM {db_prefix}testsuite_cases
+		ORDER BY id_case'
+	);
+
+	$idCases = array();
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+	{
+		$idCases[] = $row['id_case'];
+	}
+	$smcFunc['db_free_result']($request);
+
+	foreach($idCases as $key => $idCase) {
+		$request = $smcFunc['db_query']('', '
+			select count(r.id_run) from smf_testsuite_runs as r
+			INNER JOIN smf_testsuite_cases AS c ON (r.id_case = c.id_case)
+			where c.id_case = {int:id_case}',
+			array(
+				'id_case' => $idCase,
+			)
+		);
+		list ($total_num_runs) = $smcFunc['db_fetch_row']($request);
+		$smcFunc['db_free_result']($request);
+
+		$request1 = $smcFunc['db_query']('', '
+			select count(r.id_run) from smf_testsuite_runs as r
+			INNER JOIN smf_testsuite_cases AS c ON (r.id_case = c.id_case)
+			where c.id_case = {int:id_case}
+			AND r.result_achieved = {string:result}',
+			array(
+				'id_case' => $idCase,
+				'result' => 'fail',
+			)
+		);
+		list ($num_runs_failed) = $smcFunc['db_fetch_row']($request1);
+		$smcFunc['db_free_result']($request1);
+
+		//echo $num_runs . '<br />';
+		$smcFunc['db_query']('', '
+			UPDATE {db_prefix}testsuite_cases
+			SET count = {int:total_num_runs}, fail_count = {int:num_runs_failed}
+			WHERE id_case = {int:id_case}',
+				array(
+					'total_num_runs' => $total_num_runs,
+					'num_runs_failed' => $num_runs_failed,
+					'id_case' => $idCase,
+				)
+		);
+	}
 }
 
 /**
@@ -1369,179 +1468,6 @@ function TS_modifyRun(&$runOptions, &$posterOptions)
 	return true;
 }
 
-/**
- * @todo Load permissions from database
- * @global array $context
- * @global string $sourcedir
- * @global array $modSettings used for loading custom file for permissions
- * @return array representation of the permissions set 
- */
-function TS_load_permissions($level_name = false, $id_level = false)
-{
-	global $context, $smcFunc, $sourcedir, $modSettings, $user_info;
-
-	if(!$level_name)
-		return;
-
-	$request = $smcFunc['db_query']('', '
-			SELECT p.groups_can_view, p.groups_can_manage, p.groups_can_edit, p.groups_can_delete, p.groups_can_create
-			FROM {db_prefix}testsuite_' . $level_name . 's as p ' . ($id_level ? '
-			WHERE p.id_' . $level_name . ' = {int:id_level}' : '') .'
-			ORDER BY p.id_' . $level_name . ' ASC',
-			array(
-					'id_level' => $id_level,
-			)
-		);
-
-
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-	{
-		$perms = array(
-			'groups_can_view' => $row['groups_can_view'],
-			'groups_can_manage' => $row['groups_can_manage'],
-			'groups_can_edit' => $row['groups_can_edit'],
-			'groups_can_delete' => $row['groups_can_delete'],
-			'groups_can_create' => $row['groups_can_create'],
-		);
-	}
-	$smcFunc['db_free_result']($request);
-
-	return $perms;
-}
-
-/**
- * Determines whether a user can do the specified permission.
- * @global array $context
- * @global array $user_info
- * @param type $action
- * @param mixed $secondary is additional info that may be needed for the permission check
- * @return bool whether the user could perform the specified action  
- */
-function TS_can_do($action, $level_name, $secondary = 0) {
-	global $context, $smcFunc, $user_info;
-
-	if ($context['user']['is_admin']) {
-		return true;
-	}
-
-	$request = $smcFunc['db_query']('', '
-		SELECT id_' . $level_name . '
-		FROM {db_prefix}testsuite_' . $level_name . 's
-		WHERE ' . $context['TS_can_'. $action .'_query'] . '',
-		array(
-			'group_ids' => $user_info['groups']
-		)
-	);
-	if ($smcFunc['db_num_rows']($request) > 0) {
-		$smcFunc['db_free_result']($request);
-		return true;
-	}
-
-	$smcFunc['db_free_result']($request);
-	return false;
-}
-
-/**
- * Used to bundle all checks for posting a run into one definitive conditional.
- * @global array $context
- * @param array $k is used for receiving the suite id and project id
- * @return bool whether the user post a run or not
- */
-function TS_util_postrunperm($k)
-{
-	global $context;
-	
-	// What set of permissions to work with.
-	$perm = $context['test_suite']['perms'];
-	
-	/**
-	 * @todo May want to consider checking if the $k's are set, or just force
-	 *		them to be specified.
-	 */
-	
-	// Way too long conditional.
-	return ($perm['postruns_all'] || $perm['manage_all'] || $perm['postruns_proj'][$k['id_proj']] 
-			|| $perm['postruns_suite'][$k['id_suite']] || $perm['manage_project'][$k['id_proj']] || $perm['manage_suite'][$k['id_suite']]);
-}
-
-function TS_updatePermissions($perms)
-{
-	global $context, $smcFunc;
-
-	//Jokerzz on fire :D
-		TS_clearPermissions($context['test_suite']['database']['level_name'], $context['test_suite']['database']['id_level']);
-
-		$smcFunc['db_query']('', '
-				UPDATE {db_prefix}testsuite_' . $context['test_suite']['database']['level_name'] . 's
-				SET groups_can_view = {string:can_view_list}, groups_can_manage = {string:can_manage_list}, groups_can_edit = {string:can_edit_list}, groups_can_delete = {string:can_delete_list}, groups_can_create = {string:can_create_list}
-				WHERE id_'.$context['test_suite']['database']['level_name'].' = {int:id_map}',
-				array(
-						'id_map' => $context['test_suite']['database']['id_level'],
-					'can_view_list' => $context['test_suite']['database']['groups_can_view'],
-					'can_manage_list' => $context['test_suite']['database']['groups_can_manage'],
-					'can_edit_list' => $context['test_suite']['database']['groups_can_edit'],
-					'can_delete_list' => $context['test_suite']['database']['groups_can_delete'],
-					'can_create_list' => $context['test_suite']['database']['groups_can_create'],
-				)
-			);
-}
-
-function TS_clearPermissions($level_name, $id_level = false)
-{
-	global $smcFunc;
-
-		$smcFunc['db_query']('', '
-				UPDATE {db_prefix}testsuite_'. $level_name .'s
-				SET groups_can_view = {string:blank_string}, groups_can_manage = {string:blank_string}, groups_can_edit = {string:blank_string}, groups_can_delete = {string:blank_string}, groups_can_create = {string:blank_string}
-				WHERE id_'. $level_name .' = {int:id_level}',
-				array(
-						'id_level' => $id_level,
-						'blank_string' => ''
-				)
-		);
-}
-
-function TS_simple_GetProjects()
-{
-	global $context, $smcFunc;
-	
-	$request = $smcFunc['db_query']('', '
-		SELECT id_project, project_name
-		FROM {db_prefix}testsuite_projects');
-
-	if ($smcFunc['db_num_rows']($request) == 0)
-		return;
-
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-	{
-		$projectos[$row['id_project']] = $row['project_name'];
-	}
-	$smcFunc['db_free_result']($request);
-
-	return $projectos;
-}
-
-function TS_load_user_Project()
-{
-	global $context, $smcFunc, $user_info;
-	
-	$request = $smcFunc['db_query']('', '
-		SELECT id_project
-		FROM {db_prefix}members
-		WHERE id_member = {int:current_member}
-		LIMIT 1',
-		array(
-			'current_member' => $user_info['id'],
-		)
-	);
-	if ($smcFunc['db_num_rows']($request) == 0)
-		return;
-	list ($project_selected) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
-
-	return $project_selected;
-}
-
 function TS_Validator($type)
 {
 	global $context, $modSettings, $smcFunc, $txt, $memberContext;
@@ -1730,160 +1656,80 @@ function TS_Validator($type)
 		}
 }
 
-function searchArray($array, $value)
+/**
+ * @todo Load permissions from database
+ * @global array $context
+ * @global string $sourcedir
+ * @global array $modSettings used for loading custom file for permissions
+ * @return array representation of the permissions set 
+ */
+function TS_load_level_permissions($level_name = false, $id_level = false)
 {
+	global $context, $smcFunc, $sourcedir, $modSettings, $user_info;
 
-    if (is_array($array))
-    {
-        foreach ($array as $arrkey => $subarray)
-	if (in_array($value, $subarray)) {
-		return $arrkey;
-	}
-    }
-}
+	if(!$level_name)
+		return;
 
-function recountSuitesRuns() {
-	global $smcFunc, $scripturl, $context, $txt;
-	
 	$request = $smcFunc['db_query']('', '
-		SELECT id_suite
-		FROM {db_prefix}testsuite_suites
-		ORDER BY id_suite'
-	);
+			SELECT p.groups_can_view, p.groups_can_manage, p.groups_can_edit, p.groups_can_delete, p.groups_can_create
+			FROM {db_prefix}testsuite_' . $level_name . 's as p ' . ($id_level ? '
+			WHERE p.id_' . $level_name . ' = {int:id_level}' : '') .'
+			ORDER BY p.id_' . $level_name . ' ASC',
+			array(
+					'id_level' => $id_level,
+			)
+		);
 
-	$idSuites = array();
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
-		$idSuites[] = $row['id_suite'];
+		$perms = array(
+			'groups_can_view' => $row['groups_can_view'],
+			'groups_can_manage' => $row['groups_can_manage'],
+			'groups_can_edit' => $row['groups_can_edit'],
+			'groups_can_delete' => $row['groups_can_delete'],
+			'groups_can_create' => $row['groups_can_create'],
+		);
 	}
 	$smcFunc['db_free_result']($request);
 
-	foreach($idSuites as $key => $idSuite) {
-		$request = $smcFunc['db_query']('', '
-			select count(r.id_run) from smf_testsuite_runs as r
-			INNER JOIN smf_testsuite_cases AS c ON (r.id_case = c.id_case)
-			INNER JOIN smf_testsuite_suites as s ON (c.id_suite = s.id_suite)
-			where s.id_suite = {int:id_suite}',
-			array(
-				'id_suite' => $idSuite,
-			)
-		);
-		list ($total_num_runs) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
-
-		$request1 = $smcFunc['db_query']('', '
-			select count(r.id_run) from smf_testsuite_runs as r
-			INNER JOIN smf_testsuite_cases AS c ON (r.id_case = c.id_case)
-			INNER JOIN smf_testsuite_suites as s ON (c.id_suite = s.id_suite)
-			where s.id_suite = {int:id_suite}
-			AND r.result_achieved = {string:result}',
-			array(
-				'id_suite' => $idSuite,
-				'result' => 'fail',
-			)
-		);
-		list ($num_runs_failed) = $smcFunc['db_fetch_row']($request1);
-		$smcFunc['db_free_result']($request1);
-
-		//echo $num_runs . '<br />';
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}testsuite_suites
-			SET count = {int:total_num_runs}, fail_count = {int:num_runs_failed}
-			WHERE id_suite = {int:id_suite}',
-				array(
-					'total_num_runs' => $total_num_runs,
-					'num_runs_failed' => $num_runs_failed,
-					'id_suite' => $idSuite,
-				)
-		);
-	}
-	recountCasesRuns();
+	return $perms;
 }
 
-function recountCasesRuns() {
-	global $smcFunc, $scripturl, $context, $txt;
-	
-	$request = $smcFunc['db_query']('', '
-		SELECT id_case
-		FROM {db_prefix}testsuite_cases
-		ORDER BY id_case'
-	);
+function TS_updateLevelPermissions($perms)
+{
+		global $context, $smcFunc;
 
-	$idCases = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-	{
-		$idCases[] = $row['id_case'];
-	}
-	$smcFunc['db_free_result']($request);
+		TS_clearLevelPermissions($context['test_suite']['database']['level_name'], $context['test_suite']['database']['id_level']);
 
-	foreach($idCases as $key => $idCase) {
-		$request = $smcFunc['db_query']('', '
-			select count(r.id_run) from smf_testsuite_runs as r
-			INNER JOIN smf_testsuite_cases AS c ON (r.id_case = c.id_case)
-			where c.id_case = {int:id_case}',
-			array(
-				'id_case' => $idCase,
-			)
-		);
-		list ($total_num_runs) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
-
-		$request1 = $smcFunc['db_query']('', '
-			select count(r.id_run) from smf_testsuite_runs as r
-			INNER JOIN smf_testsuite_cases AS c ON (r.id_case = c.id_case)
-			where c.id_case = {int:id_case}
-			AND r.result_achieved = {string:result}',
-			array(
-				'id_case' => $idCase,
-				'result' => 'fail',
-			)
-		);
-		list ($num_runs_failed) = $smcFunc['db_fetch_row']($request1);
-		$smcFunc['db_free_result']($request1);
-
-		//echo $num_runs . '<br />';
 		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}testsuite_cases
-			SET count = {int:total_num_runs}, fail_count = {int:num_runs_failed}
-			WHERE id_case = {int:id_case}',
+				UPDATE {db_prefix}testsuite_' . $context['test_suite']['database']['level_name'] . 's
+				SET groups_can_view = {string:can_view_list}, groups_can_manage = {string:can_manage_list}, groups_can_edit = {string:can_edit_list}, groups_can_delete = {string:can_delete_list}, groups_can_create = {string:can_create_list}
+				WHERE id_'.$context['test_suite']['database']['level_name'].' = {int:id_map}',
 				array(
-					'total_num_runs' => $total_num_runs,
-					'num_runs_failed' => $num_runs_failed,
-					'id_case' => $idCase,
+						'id_map' => $context['test_suite']['database']['id_level'],
+					'can_view_list' => $context['test_suite']['database']['groups_can_view'],
+					'can_manage_list' => $context['test_suite']['database']['groups_can_manage'],
+					'can_edit_list' => $context['test_suite']['database']['groups_can_edit'],
+					'can_delete_list' => $context['test_suite']['database']['groups_can_delete'],
+					'can_create_list' => $context['test_suite']['database']['groups_can_create'],
 				)
 		);
-	}
 }
 
-/*function TS_level_permission($action = false, $level_name = false, $id_level = false) {
-		global $smcFunc, $scripturl, $context, $txt, $user_info;
+function TS_clearLevelPermissions($level_name, $id_level = false)
+{
+	global $smcFunc;
 
-		//load the permission as per passed params
-		$request = $smcFunc['db_query']('', '
-		SELECT p.id_group, p.permission, p.id_level, p.level_name
-		FROM {db_prefix}testsuite_global_permissions as p WHERE p.permission = {string:action}
-		AND p.id_group IN ({array_int:user_groups})' . ($level_name ? '
-		AND p.level_name = {string:level_name}' : '') . ($id_level ? '
-		AND p.id_level = {int:id_level}' : '') .'
-		ORDER BY permission ASC',
+		$smcFunc['db_query']('', '
+				UPDATE {db_prefix}testsuite_'. $level_name .'s
+				SET groups_can_view = {string:blank_string}, groups_can_manage = {string:blank_string}, groups_can_edit = {string:blank_string}, groups_can_delete = {string:blank_string}, groups_can_create = {string:blank_string}
+				WHERE id_'. $level_name .' = {int:id_level}',
 				array(
-				'level_name' => $level_name,
-				'action' => $action,
-				'id_level' => $id_level,
-				'user_groups' => $user_info['groups']
+						'id_level' => $id_level,
+						'blank_string' => ''
 				)
 		);
-
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-		{
-			$id_level[] = $row['id_level'];
-		}
-		$smcFunc['db_free_result']($request);
-		//print_r($id_level);
-		//die();
-		return $id_level;
-}*/
-
+}
 
 function TS_load_global_permissions()
 {
@@ -1997,6 +1843,116 @@ function TS_is_user_allowed($array, $string, $delim=',') {
 	} else {
 		return false;
 	}
+}
+
+function TS_simple_GetProjects()
+{
+	global $context, $smcFunc;
+	
+	$request = $smcFunc['db_query']('', '
+		SELECT id_project, project_name
+		FROM {db_prefix}testsuite_projects');
+
+	if ($smcFunc['db_num_rows']($request) == 0)
+		return;
+
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+	{
+		$projectos[$row['id_project']] = $row['project_name'];
+	}
+	$smcFunc['db_free_result']($request);
+
+	return $projectos;
+}
+
+function TS_load_user_Project()
+{
+	global $context, $smcFunc, $user_info;
+	
+	$request = $smcFunc['db_query']('', '
+		SELECT id_project
+		FROM {db_prefix}members
+		WHERE id_member = {int:current_member}
+		LIMIT 1',
+		array(
+			'current_member' => $user_info['id'],
+		)
+	);
+	if ($smcFunc['db_num_rows']($request) == 0)
+		return;
+	list ($project_selected) = $smcFunc['db_fetch_row']($request);
+	$smcFunc['db_free_result']($request);
+
+	return $project_selected;
+}
+
+function searchArray($array, $value)
+{
+
+    if (is_array($array))
+    {
+        foreach ($array as $arrkey => $subarray)
+	if (in_array($value, $subarray)) {
+		return $arrkey;
+	}
+    }
+}
+
+
+//Current all functions below this line are obsolete
+/**
+ * Determines whether a user can do the specified permission.
+ * @global array $context
+ * @global array $user_info
+ * @param type $action
+ * @param mixed $secondary is additional info that may be needed for the permission check
+ * @return bool whether the user could perform the specified action  
+ */
+function TS_can_do($action, $level_name, $secondary = 0) {
+	global $context, $smcFunc, $user_info;
+
+	if ($context['user']['is_admin']) {
+		return true;
+	}
+
+	$request = $smcFunc['db_query']('', '
+		SELECT id_' . $level_name . '
+		FROM {db_prefix}testsuite_' . $level_name . 's
+		WHERE ' . $context['TS_can_'. $action .'_query'] . '',
+		array(
+			'group_ids' => $user_info['groups']
+		)
+	);
+	if ($smcFunc['db_num_rows']($request) > 0) {
+		$smcFunc['db_free_result']($request);
+		return true;
+	}
+
+	$smcFunc['db_free_result']($request);
+	return false;
+}
+
+/**
+ * Used to bundle all checks for posting a run into one definitive conditional.
+ * @global array $context
+ * @param array $k is used for receiving the suite id and project id
+ * @return bool whether the user post a run or not
+ */
+function TS_util_postrunperm($k)
+{
+	global $context;
+	
+	// What set of permissions to work with.
+	$perm = $context['test_suite']['perms'];
+	
+	/**
+	 * @todo May want to consider checking if the $k's are set, or just force
+	 *		them to be specified.
+	 */
+	
+	// Way too long conditional.
+	return ($perm['postruns_all'] || $perm['manage_all'] || $perm['postruns_proj'][$k['id_proj']] 
+			|| $perm['postruns_suite'][$k['id_suite']] || $perm['manage_project'][$k['id_proj']] || $perm['manage_suite'][$k['id_suite']]);
 }
 
 ?>

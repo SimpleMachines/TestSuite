@@ -130,16 +130,6 @@ $txt['ts_members'] = 'Regular Members';
 // TS Permissions...
 $txt['ts_perm'] = 'Test Suite Permissions';
 $txt['ts_global_perm'] = 'Adjust global permissions';
-/*$txt['ts_perm_level'] = 'Adjust permission per level';
-$txt['ts_perm_level_projects'] = 'Manage Permission for all projects';
-$txt['ts_perm_level_suites'] = 'Manage Permission for all suites';
-$txt['ts_perm_level_cases'] = 'Manage Permission for all cases';
-$txt['ts_perm_level_runs'] = 'Manage Permission for all runs';
-$txt['ts_perm_view_all'] = 'View All';
-$txt['ts_perm_manage_all'] = 'Manage All';
-$txt['ts_perm_postruns_all'] = 'Post Runs Anywhere';
-$txt['ts_perm_manage_specific'] = 'Manage Suite and Project Specific Permissions';*/
-
 $txt['ts_perm_groups_can_view'] = 'Groups can View';
 $txt['ts_perm_groups_can_manage'] = 'Groups can Manage';
 $txt['ts_perm_groups_can_edit'] = 'Groups can Edit';
@@ -150,7 +140,7 @@ $txt['ts_global_perm_create_new_projects'] = 'Groups can create new projects';
 $txt['ts_global_perm_view_all_runs'] = 'Groups can view all runs';
 $txt['ts_global_perm_allowed_to_administrate'] = 'Groups allowed to administrate TestSuite';
 
-// SM Test suite
+// SM Test suite Error messages
 $txt['ts_error_no_name'] = 'Name field was left empty.';
 $txt['ts_error_no_description'] = 'Description field was left empty.';
 $txt['ts_error_no_message'] = 'Description field was left empty.';
