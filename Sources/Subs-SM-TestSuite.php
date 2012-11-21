@@ -1851,13 +1851,13 @@ function recountCasesRuns() {
 	}
 }
 
-function TS_level_permission($action = false, $level_name = false, $id_level = false) {
+/*function TS_level_permission($action = false, $level_name = false, $id_level = false) {
 		global $smcFunc, $scripturl, $context, $txt, $user_info;
 
 		//load the permission as per passed params
 		$request = $smcFunc['db_query']('', '
 		SELECT p.id_group, p.permission, p.id_level, p.level_name
-		FROM {db_prefix}testsuite_permissions as p WHERE p.permission = {string:action}
+		FROM {db_prefix}testsuite_global_permissions as p WHERE p.permission = {string:action}
 		AND p.id_group IN ({array_int:user_groups})' . ($level_name ? '
 		AND p.level_name = {string:level_name}' : '') . ($id_level ? '
 		AND p.id_level = {int:id_level}' : '') .'
@@ -1878,7 +1878,7 @@ function TS_level_permission($action = false, $level_name = false, $id_level = f
 		//print_r($id_level);
 		//die();
 		return $id_level;
-}
+}*/
 
 
 function TS_load_global_permissions()
@@ -1887,7 +1887,7 @@ function TS_load_global_permissions()
 
 	$request = $smcFunc['db_query']('', '
 		SELECT permission, member_groups
-		FROM {db_prefix}testsuite_permission'
+		FROM {db_prefix}testsuite_global_permissions'
 	);
 
 	while ($row = $smcFunc['db_fetch_assoc']($request))
@@ -1912,7 +1912,7 @@ function TS_updateGlobalPermissions()
     {
         $key = $smcFunc['htmlspecialchars']($key);
             $smcFunc['db_query']('', '
-                UPDATE {db_prefix}testsuite_permission
+                UPDATE {db_prefix}testsuite_global_permissions
                 SET member_groups = {string:member_groups}
                 WHERE permission = {string:permission}',
                 array(
@@ -1928,7 +1928,7 @@ function TS_clearGlobalPermissions()
 	global $smcFunc;
 
     $smcFunc['db_query']('', '
-        UPDATE {db_prefix}testsuite_permission
+        UPDATE {db_prefix}testsuite_global_permissions
         SET member_groups = {string:blank_string}',
         array(
             'blank_string' => '',
@@ -1947,7 +1947,7 @@ function TS_load_global_user_permissions() {
 
 	$request = $smcFunc['db_query']('', '
 		SELECT permission, member_groups
-		FROM {db_prefix}testsuite_permission
+		FROM {db_prefix}testsuite_global_permissions
 		WHERE '.$TS_can_do
 	);
 

@@ -517,7 +517,7 @@ $tables = array(
 			),
 		),
 	),
-    'testsuite_permission' => array(
+    'testsuite_global_permissions' => array(
 		'columns' => array(
 			array(
 				'name' => 'permission',
@@ -562,7 +562,7 @@ foreach ($default_global_perms as $perm)
 {
 	// Insert the Project.
 	$smcFunc['db_insert']('',
-		'{db_prefix}testsuite_permission',
+		'{db_prefix}testsuite_global_permissions',
 		array(
 			'permission' => 'string-255', 'member_groups' => 'string-255',
 		),

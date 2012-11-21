@@ -1316,16 +1316,12 @@ function template_testsuite_admin()
 		<h3 class="catbg">Test Suite Permissions</h2>
 	</div>
 	<div class="suite_frame">';
-
-
 	
 	echo '
 	<form action="', $context['test_suite']['url'], ';admin=main" method="post">';
 
 		foreach ($context['test_suite']['global_perms'] as $perm)
 		{
-				//echo $perm['permission'];
-				//echo $perm['member_groups'];
 				$perm['member_groups'] = $perm['member_groups'] == '' ? '' : explode(',', $perm['member_groups']);
 			echo ' <fieldset>';
 			echo '<legend>' . $txt['ts_global_perm_' . $perm['permission']] . '</legend>';
@@ -1338,30 +1334,14 @@ function template_testsuite_admin()
 			echo ' </fieldset>';
 		}
 
-		/*echo '
-		<input type="hidden" name="level_name" value="', $context['test_suite']['permission']['level_name'], '" />';*/
-
-		/*if (!empty($context['test_suite']['permission']['id_level']))
-		echo ' <input type="hidden" name="id_level" value="', $context['test_suite']['permission']['id_level'] , '" />';*/
-
 		echo '
 		<input type="submit" name="submit" value="', $txt['ts_submit'], '" tabindex="', $context['tabindex']++, '" class="button_submit" />';
 
 	echo '
 	</form>';
 
-
-
-
-
 	echo'
 	</div>';
-
-	echo '<p></p>
-	<div class="cat_bar">
-		<h3 class="catbg">Something Else</h2>
-	</div>
-	<div class="suite_frame">I like me, am you.</div>';
 }
 
 function template_testsuite_admin_per_level()
