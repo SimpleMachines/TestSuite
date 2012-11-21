@@ -1885,11 +1885,10 @@ function TS_load_global_permissions()
 {
 	global $context, $smcFunc, $sourcedir, $modSettings, $user_info;
 
-		$request = $smcFunc['db_query']('', '
-			SELECT permission, member_groups
-			FROM {db_prefix}testsuite_permission'
-		);
-
+	$request = $smcFunc['db_query']('', '
+		SELECT permission, member_groups
+		FROM {db_prefix}testsuite_permission'
+	);
 
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
@@ -1903,6 +1902,65 @@ function TS_load_global_permissions()
 	return $perms;
 }
 
+function TS_updateGlobalPermissions()
+{
+	global $context, $smcFunc;
+
+	TS_clearGlobalPermissions();
+
+    foreach ($context['test_suite']['global_perm_database'] as $key => $value)
+    {
+        $key = $smcFunc['htmlspecialchars']($key);
+            $smcFunc['db_query']('', '
+                UPDATE {db_prefix}testsuite_permission
+                SET member_groups = {string:member_groups}
+                WHERE permission = {string:permission}',
+                array(
+                    'member_groups' => $value,
+                    'permission' => $key,
+                )
+            );
+    }
+}
+
+function TS_clearGlobalPermissions()
+{
+	global $smcFunc;
+
+    $smcFunc['db_query']('', '
+        UPDATE {db_prefix}testsuite_permission
+        SET member_groups = {string:blank_string}',
+        array(
+            'blank_string' => '',
+        )
+    );
+}
+
+function TS_load_global_user_permissions() {
+	global $context, $smcFunc, $user_info;
+
+	if($user_info['is_admin']) {
+		$TS_can_do = '1=1';
+	} else {
+		$TS_can_do = '(FIND_IN_SET(' . implode(', member_groups) != 0 OR FIND_IN_SET(', $user_info['groups']) . ', member_groups) != 0' . ')';
+	}
+
+	$request = $smcFunc['db_query']('', '
+		SELECT permission, member_groups
+		FROM {db_prefix}testsuite_permission
+		WHERE '.$TS_can_do
+	);
+
+	$global_perms = array();
+	//Lets see how many supermans power he/she has
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+	{
+		$global_perms[] = $row['permission'];
+	}
+	$smcFunc['db_free_result']($request);
+
+	return $global_perms;
+}
 /**
  * Used to checks whether string value exist in array or not.
  * @array $array contains the array to check against

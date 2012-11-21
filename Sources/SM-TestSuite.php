@@ -56,8 +56,7 @@ function TS_SMTestSuiteMain()
 		debug_code();
 	}
 
-	//Load all global permissions for TS
-	$context['test_suite']['global_perms'] = TS_load_global_permissions();
+	$context['test_suite']['user_global_perms'] = TS_load_global_user_permissions();
 
 	if(!TS_can_do('view', 'project')) {
 		fatal_lang_error('ts_cannot_permission_generic');
@@ -1860,6 +1859,20 @@ function TS_Admin_Main()
 		'url' => $context['test_suite']['url'] . ';admin',
 		'name' => $txt['ts_admin'],
 	);
+
+	$context['test_suite']['global_perms'] = TS_load_global_permissions();
+
+	if (isset($_POST['submit']))
+	{
+		$context['test_suite']['global_perm_database'] = array();
+		foreach($_POST as $key => $val) {
+			$context['test_suite']['global_perm_database'][$key] = isset($val) && !empty($val) ? implode(",", $val) : '';
+		}
+		unset($context['test_suite']['global_perm_database']['submit']);
+
+		TS_updateGlobalPermissions($context['test_suite']['global_perm_database']);
+		redirectexit('action=testsuite;admin=per_level;level_name='. $context['test_suite']['permission']['level_name'] .';id_level='.$context['test_suite']['permission']['id_level']);
+	}
 }
 
 function TS_Admin_PerLevel()
