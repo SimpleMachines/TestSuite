@@ -243,6 +243,7 @@ function TS_loadSuite($suite_id, $load_cases = true)
 			ORDER BY id_case',
 			array(
 				'current_suite' => $suite_id,
+				'id_member' => $user_info['id']
 			)
 		);
 		$suite['cases'] = array();
