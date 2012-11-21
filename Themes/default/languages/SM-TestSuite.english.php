@@ -35,7 +35,8 @@ $txt['ts_project_name'] = 'Project Name';
 $txt['ts_project_description'] = 'Description';
 $txt['ts_back_to_project'] = 'Back to Project';
 $txt['ts_last_edit_by'] = 'Last edited by';
-$txt['ts_no_loaded_projects'] = 'There appear to be no projects available. You can create one by selecting "Create Project".';
+$txt['ts_no_loaded_projects_create'] = 'There appear to be no projects available. You can create one by selecting "Create Project".';
+$txt['ts_no_loaded_projects'] = 'There appear to be no projects available.';
 $txt['ts_no_loaded_suites_create'] = 'There appear to be no suites available. You can create one by selecting "Create Suite".';
 $txt['ts_no_loaded_suites'] = 'There appear to be no suites available.';
 $txt['ts_no_loaded_cases_create'] = 'There appear to be no cases available. You can create one by selecting "Create Case".';
@@ -161,4 +162,5 @@ $txt['ts_no_suite'] = 'Sorry, the Suite you are trying to edit doesn\'t exist.';
 $txt['ts_no_case'] = 'Sorry, the Case you are trying to edit doesn\'t exist.';
 $txt['ts_no_run'] = 'Sorry, the Run you are trying to edit doesn\'t exist.';
 
+$txt['ts_error_create_project'] = 'Sorry, you are not allowed to create projects.';
 ?>

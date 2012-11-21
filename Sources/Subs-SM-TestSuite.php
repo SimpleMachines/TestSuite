@@ -30,7 +30,11 @@ function TS_requestProjects()
 		SELECT p.id_project, p.project_name, p.description, p.id_member, p.poster_name, p.poster_time, p.poster_email, p.modified_time, p.modified_by, p.groups_can_view, p.groups_can_manage, p.groups_can_edit, p.groups_can_delete
 		FROM {db_prefix}testsuite_projects as p
 		WHERE '. $context['TS_can_view_query'] .'
-		ORDER BY id_project'
+		OR p.id_member = {int:id_member}
+		ORDER BY id_project',
+				array(
+					'id_member' => $user_info['id']
+				)
 		);
 
 	$projects = array();
@@ -1952,10 +1956,9 @@ function TS_load_global_user_permissions() {
 	);
 
 	$global_perms = array();
-	//Lets see how many supermans power he/she has
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
-		$global_perms[] = $row['permission'];
+		$global_perms[$row['permission']] = true;
 	}
 	$smcFunc['db_free_result']($request);
 

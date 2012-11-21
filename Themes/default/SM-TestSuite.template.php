@@ -69,8 +69,13 @@ function template_main()
 	<div class="suite_frame">';
 	if (empty($context['test_suite']['projects']))
 	{
-		echo '
-		<div class="error">' . $txt['ts_no_loaded_projects'] . '</div>';
+		if(isset($context['test_suite']['user_global_perms']['create_new_projects'])) {
+				echo '
+				<div class="error">' . $txt['ts_no_loaded_projects_create'] . '</div>';
+		} else {
+				echo '
+				<div class="error">' . $txt['ts_no_loaded_projects'] . '</div>';
+		}
 	}
 
 	echo '

@@ -56,11 +56,12 @@ function TS_SMTestSuiteMain()
 		debug_code();
 	}
 
+	//Lets see how many supermans power user has
 	$context['test_suite']['user_global_perms'] = TS_load_global_user_permissions();
 
-	if(!TS_can_do('view', 'project')) {
+	/*if(!TS_can_do('view', 'project')) {
 		fatal_lang_error('ts_cannot_permission_generic');
-	}
+	}*/
 
 	// Add a link to the Christmas tree!
 	$context['linktree'][] = array(
@@ -135,12 +136,16 @@ function TS_ShowProjectList()
 	// Show off our projects how about it?
 	require_once($sourcedir . '/Subs-SM-TestSuite.php');
 	$context['test_suite']['projects'] = TS_requestProjects();
+
+	$context['test_suite']['buttons'] = array();
+	if(isset($context['test_suite']['user_global_perms']['create_new_projects'])) {
 	$context['test_suite']['buttons'] = array(
 		array(
 			'href' => $context['test_suite']['url'] . ';createproject',
 			'name' => $txt['ts_create_project'],
 		),
 	);
+	}
 }
 
 /**
@@ -322,6 +327,10 @@ function TS_Project()
 {
 	global $txt, $scripturl, $modSettings, $user_info, $context, $sourcedir, $smcFunc, $settings;
 
+	if(!isset($context['test_suite']['user_global_perms']['create_new_projects'])) {
+		fatal_lang_error('ts_error_create_project', false);		
+	}
+
 	// Get Project ID For suites
 	$context['test_suite']['current_project'] = isset($_REQUEST['proj']) ? (int) $_REQUEST['proj'] : 0;
 
@@ -389,7 +398,9 @@ function TS_Project2()
 {
 	global $txt, $modSettings, $sourcedir, $context, $scripturl, $user_info, $smcFunc;
 
-	isAllowedTo('ts_post_projects');
+	if(!isset($context['test_suite']['user_global_perms']['create_new_projects'])) {
+		fatal_lang_error('ts_error_create_project', false);		
+	}
 	
 	require_once($sourcedir . '/Subs-SM-TestSuite.php');
 
