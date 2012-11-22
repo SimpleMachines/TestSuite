@@ -1658,6 +1658,40 @@ function TS_Validator($type)
 }
 
 /**
+ * Determines whether a user can do the specified permission for a specific level with id.
+ * @global array $context
+ * @global array $user_info
+ * @param type $action
+ * @param mixed $secondary is additional info that may be needed for the permission check
+ * @return bool whether the user could perform the specified action  
+ */
+function TS_can_do($action, $level_name, $level_id) {
+	global $context, $smcFunc, $user_info;
+
+	if ($context['user']['is_admin']) {
+		return true;
+	}
+	echo $level_id;
+
+	$request = $smcFunc['db_query']('', '
+		SELECT id_' . $level_name . '
+		FROM {db_prefix}testsuite_' . $level_name . 's
+		WHERE id_'. $level_name .' = {int:id_level}
+		AND '. $context['TS_can_'.$action.'_query'] .'',
+		array(
+			'id_level' => $level_id
+		)
+	);
+	if ($smcFunc['db_num_rows']($request) > 0) {
+		$smcFunc['db_free_result']($request);
+		return true;
+	}
+
+	$smcFunc['db_free_result']($request);
+	return false;
+}
+
+/**
  * @todo Load permissions from database
  * @global array $context
  * @global string $sourcedir
@@ -1901,38 +1935,6 @@ function searchArray($array, $value)
 
 
 //Current all functions below this line are obsolete
-/**
- * Determines whether a user can do the specified permission.
- * @global array $context
- * @global array $user_info
- * @param type $action
- * @param mixed $secondary is additional info that may be needed for the permission check
- * @return bool whether the user could perform the specified action  
- */
-function TS_can_do($action, $level_name, $secondary = 0) {
-	global $context, $smcFunc, $user_info;
-
-	if ($context['user']['is_admin']) {
-		return true;
-	}
-
-	$request = $smcFunc['db_query']('', '
-		SELECT id_' . $level_name . '
-		FROM {db_prefix}testsuite_' . $level_name . 's
-		WHERE ' . $context['TS_can_'. $action .'_query'] . '',
-		array(
-			'group_ids' => $user_info['groups']
-		)
-	);
-	if ($smcFunc['db_num_rows']($request) > 0) {
-		$smcFunc['db_free_result']($request);
-		return true;
-	}
-
-	$smcFunc['db_free_result']($request);
-	return false;
-}
-
 /**
  * Used to bundle all checks for posting a run into one definitive conditional.
  * @global array $context

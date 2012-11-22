@@ -154,6 +154,11 @@ function TS_ShowCurrentProject()
 	// Load our info! It's trustworthy, trust us.
 	require_once($sourcedir . '/Subs-SM-TestSuite.php');
 
+	if (!TS_can_do('view', 'project', $context['test_suite']['current_project']))
+	{
+		fatal_lang_error('ts_cannot_permission_generic');
+	}
+
 	// If the project is invalid, the function called will take care of it.
 	$context['test_suite']['project'] = TS_loadProject($context['test_suite']['current_project']);
 
@@ -195,6 +200,11 @@ function TS_ShowCurrentSuite()
 
 	// The heart and gold of our magic.
 	require_once($sourcedir . '/Subs-SM-TestSuite.php');
+
+	if (!TS_can_do('view', 'suite', $context['test_suite']['current_project']))
+	{
+		fatal_lang_error('ts_cannot_permission_generic');
+	}
 
 	// If the suite is invalid, the function called will take care of it.
 	$context['test_suite']['suite'] = TS_loadSuite($context['test_suite']['current_suite']);
@@ -242,7 +252,12 @@ function TS_ShowCurrentCase()
 
 	// Load the case for the template to have its way with.
 	require_once($sourcedir . '/Subs-SM-TestSuite.php');
-	
+
+	if (!TS_can_do('view', 'case', $context['test_suite']['current_project']))
+	{
+		fatal_lang_error('ts_cannot_permission_generic');
+	}
+
 	// If the case is invalid, the calling function takes care of it.
 	$context['test_suite']['case'] = TS_loadCase($context['test_suite']['current_case']);
 	$context['page_title'] = $context['test_suite']['case']['name'];
