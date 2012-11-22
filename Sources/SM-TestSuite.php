@@ -25,6 +25,8 @@ function TS_SMTestSuiteMain()
 	// Call CSS :P, which we have made with utmost love.
 	$context['html_headers'] .= '<link rel="stylesheet" type="text/css" href="' . $settings['default_theme_url'] .  '/css/SM-TestSuite.css" />';
 
+	$context['html_headers'] .= '<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>';
+
 	// Load our template & language file.
 	loadTemplate('SM-TestSuite');
 	loadLanguage('SM-TestSuite');
@@ -103,6 +105,7 @@ function TS_SMTestSuiteMain()
 		'adminperlevel' => 'TS_Admin_PerLevel',
 		'updateproject' => 'TS_UpdateDefaultProject',
 		'updatepermissions' => 'TS_Admin_UpdatePermissions',
+		'updateGlobalCollapse' => 'TS_update_global_collapse',
 	);
 
 	foreach ($subActions as $key => $action)
@@ -1948,6 +1951,20 @@ function TS_UpdateDefaultProject()
 
 	updateMemberData($user_info['id'], array('id_project' => $id_project));
 	redirectexit($context['test_suite']['url'] . ';project=' . $id_project);
+}
+
+function TS_update_global_collapse()
+{
+	global $context, $user_info, $smcFunc;
+
+	if (!isset($_POST['value']) || !isset($_POST['permission']))
+	{
+		return;
+	}
+	$value = (int) $_POST['value'];
+	$perm = $smcFunc['htmlspecialchars']($_POST['permission']);
+
+	updateGlobalCollapse($perm, $value);
 }
 
 ?>

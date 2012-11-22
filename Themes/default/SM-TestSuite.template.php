@@ -1329,13 +1329,15 @@ function template_testsuite_admin()
 		{
 				$perm['member_groups'] = $perm['member_groups'] == '' ? '' : explode(',', $perm['member_groups']);
 			echo ' <fieldset>';
-			echo '<legend>' . $txt['ts_global_perm_' . $perm['permission']] . '</legend>';
+			echo '<legend class="global_perm_heading" id="'. $perm['permission']. '">' . $txt['ts_global_perm_' . $perm['permission']] . '</legend>';
 
+			echo '<div class="global_perm_input"',!empty($perm['collapsed']) ? 'style="display:none"' : '','>';
 			foreach ($context['test_suite']['groups'] as $group)
 			{
 				echo '
 					<input' . (is_array($perm['member_groups']) && in_array($group['id_group'], $perm['member_groups']) ? ' checked="checked"' : '') . ' id="' . $group['id_group'] . '" type="checkbox" name="' . $perm['permission'] . '[]" value="' . $group['id_group'] . '" /> <label for="' . $group['id_group'] . '">' . $group['group_name'] . '</label><br />';
 			}
+			echo '</div>';
 			echo ' </fieldset>';
 		}
 
@@ -1347,6 +1349,32 @@ function template_testsuite_admin()
 
 	echo'
 	</div>';
+
+	echo '
+		<script type="text/javascript">
+			$(document).ready(function() {
+				$(".global_perm_heading").click(function(e) {
+					//check if already visible or not
+					var elem = $(this).next(".global_perm_input");
+					var isAlreadyVisible = elem.is(":visible");
+					var isVisible = (isAlreadyVisible) ? 1 : 0;
+					var perm = e.target.id;
+					$.ajax({
+						url: smf_prepareScriptUrl(smf_scripturl) + "action=testsuite;updateGlobalCollapse",
+						type: "post",
+						data: {
+							"permission" : perm,
+							"value" : isVisible
+						},
+						success:function() {
+						},
+						error : function(resp) {
+						}
+					});
+					elem.slideToggle(500);
+				});
+			});
+		</script>';
 }
 
 function template_testsuite_admin_per_level()

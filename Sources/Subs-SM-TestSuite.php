@@ -1771,8 +1771,9 @@ function TS_load_global_permissions()
 	global $context, $smcFunc, $sourcedir, $modSettings, $user_info;
 
 	$request = $smcFunc['db_query']('', '
-		SELECT permission, member_groups
-		FROM {db_prefix}testsuite_global_permissions'
+		SELECT permission, member_groups, collapsed
+		FROM {db_prefix}testsuite_global_permissions
+		ORDER BY permission'
 	);
 
 	while ($row = $smcFunc['db_fetch_assoc']($request))
@@ -1780,6 +1781,7 @@ function TS_load_global_permissions()
 		$perms[] = array(
 			'permission' => $row['permission'],
 			'member_groups' => $row['member_groups'],
+			'collapsed' => $row['collapsed'],
 		);
 	}
 	$smcFunc['db_free_result']($request);
@@ -1857,6 +1859,21 @@ function TS_load_global_user_permissions() {
 	$smcFunc['db_free_result']($request);
 
 	return $global_perms;
+}
+
+function updateGlobalCollapse($perm, $value) {
+		global $context, $smcFunc;
+
+		$smcFunc['db_query']('', '
+				UPDATE {db_prefix}testsuite_global_permissions
+				SET collapsed = {int:value}
+				WHERE permission = {string:permission}',
+				array(
+					'value' => $value,
+					'permission' =>$perm
+				)
+		);
+		return true;
 }
 /**
  * Used to checks whether string value exist in array or not.

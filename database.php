@@ -532,6 +532,14 @@ $tables = array(
 				'size' => 255,
 				'default' => '',
 			),
+            array(
+				'name' => 'collapsed',
+				'type' => 'int',
+				'size' => 10,
+				'unsigned' => true,
+				'null' => false,
+				'default' => 0,
+			),
 		),
         'indexes' => array(),
 	),
@@ -555,9 +563,9 @@ $smcFunc['db_add_column']('{db_prefix}members', $column);
 
 
 $default_global_perms = array(
-	array('permission' => 'create_new_projects', 'member_groups' => ''),
-	array('permission' => 'view_all_runs', 'member_groups' => ''),
-	array('permission' => 'allowed_to_administrate', 'member_groups' => ''),
+	array('permission' => 'create_new_projects', 'member_groups' => '', 'collapsed' => 0),
+	array('permission' => 'view_all_runs', 'member_groups' => '', 'collapsed' => 0),
+	array('permission' => 'allowed_to_administrate', 'member_groups' => '', 'collapsed' => 0),
 );
 
 foreach ($default_global_perms as $perm)
