@@ -23,6 +23,7 @@ function TS_AddToMenu(&$buttons)
 {
 	global $txt, $scripturl, $user_info;
 
+	loadLanguage('SM-TestSuite');
 	$button['testsuite'] = array(
 		'title' => $txt['sm_testsuite'],
 		'href' => $scripturl . '?action=testsuite',
