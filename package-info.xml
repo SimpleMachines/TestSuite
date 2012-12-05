@@ -10,7 +10,6 @@
 
 	<install for="2.0 - 2.0.99">
 		<readme parsebbc="true">readme.txt</readme>
-		<modification>modification.xml</modification>
 		<require-file name="Sources/SM-TestSuite.php" destination="$sourcedir" />
 		<require-file name="Sources/Subs-SM-TestSuite.php" destination="$sourcedir" />
 		<require-file name="Sources/Hooks-SM-TestSuite.php" destination="$sourcedir" />
@@ -27,7 +26,6 @@
 	</install>
 
 	<uninstall for="2.0 - 2.0.99">
-		<modification reverse="true">modification.xml</modification>
 		<code>uninstall.php</code>
 		<remove-file name="Sources/SM-TestSuite.php" destination="$sourcedir" />
 		<remove-file name="Sources/Subs-SM-TestSuite.php" destination="$sourcedir" />
