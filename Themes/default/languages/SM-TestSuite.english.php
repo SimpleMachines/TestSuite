@@ -156,4 +156,9 @@ $txt['ts_no_case'] = 'Sorry, the Case you are trying to edit doesn\'t exist.';
 $txt['ts_no_run'] = 'Sorry, the Run you are trying to edit doesn\'t exist.';
 
 $txt['ts_error_create_project'] = 'Sorry, you are not allowed to create projects.';
+
+// Used for main menu of test suite.
+$txt['sm_testsuite'] = 'Test Suite';
+$txt['ts_admin'] = 'Manage Test Suite';
+
 ?>
