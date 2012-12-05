@@ -1964,7 +1964,14 @@ function TS_update_global_collapse()
 	$value = (int) $_POST['value'];
 	$perm = $smcFunc['htmlspecialchars']($_POST['permission']);
 
-	updateGlobalCollapse($perm, $value);
+	$resp = updateGlobalCollapse($perm, $value);
+	if($resp) {
+		$response = array( 'success' => true);
+	} else {
+		$response = array( 'success' => false);
+	}	
+	echo json_encode( $response );
+	die();
 }
 
 ?>

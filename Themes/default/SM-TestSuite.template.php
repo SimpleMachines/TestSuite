@@ -1359,16 +1359,18 @@ function template_testsuite_admin()
 					var isAlreadyVisible = elem.is(":visible");
 					var isVisible = (isAlreadyVisible) ? 1 : 0;
 					var perm = e.target.id;
-					$.ajax({
-						url: smf_prepareScriptUrl(smf_scripturl) + "action=testsuite;updateGlobalCollapse",
-						type: "post",
-						data: {
-							"permission" : perm,
-							"value" : isVisible
-						},
-						success:function() {
-						},
-						error : function(resp) {
+
+					var sendData = {
+						permission : perm,
+						value : isVisible,
+					};
+
+					var ajaxurl = smf_prepareScriptUrl(smf_scripturl) + "action=testsuite;updateGlobalCollapse";
+					$.post( ajaxurl, sendData, function( response ) {
+						if( response == true ) {
+							console.log(response);
+						} else {
+							console.log(response);
 						}
 					});
 					elem.slideToggle(500);
